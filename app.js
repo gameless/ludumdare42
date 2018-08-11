@@ -164,6 +164,9 @@ require.register("states/boot.ts", function(exports, require, module) {
 "use strict";
 function default_1(game) {
     return {
+        preload: function () {
+            game.load.audio('pot_music', 'assets/Audio/Music/LD42TitleMusic.mp3');
+        },
         create: function () {
             game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
             game.scale.setUserScale(7, 7);
@@ -190,6 +193,7 @@ function default_1(game) {
             graphics.beginFill(0xffa500);
             graphics.drawCircle(100, 75, 100);
             graphics.endFill();
+            game.sound.play('pot_music');
         }
     };
 }
