@@ -156,8 +156,7 @@ var game = new Phaser.Game({ width: 160, height: 90, parent: 'parent', antialias
 game.state.add('boot', boot_1.default(game));
 game.state.add('pot', pot_1.default(game));
 game.state.start('boot');
-
-
+//# sourceMappingURL=initialize.js.map
 });
 
 require.register("states/boot.ts", function(exports, require, module) {
@@ -165,7 +164,10 @@ require.register("states/boot.ts", function(exports, require, module) {
 function default_1(game) {
     return {
         preload: function () {
-            game.load.audio('pot_music', 'assets/Audio/Music/LD42TitleMusic.mp3');
+            game.load.audio('pot_music', [
+                'Audio/Music/LD42TitleMusic.mp3',
+                'Audio/Music/LD42TitleMusic.ogg'
+            ]);
         },
         create: function () {
             game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
@@ -180,8 +182,7 @@ function default_1(game) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 ;
-
-
+//# sourceMappingURL=boot.js.map
 });
 
 require.register("states/pot.ts", function(exports, require, module) {
@@ -193,15 +194,14 @@ function default_1(game) {
             graphics.beginFill(0xffa500);
             graphics.drawCircle(100, 75, 100);
             graphics.endFill();
-            game.sound.play('pot_music');
+            game.sound.play('pot_music', 1, true);
         }
     };
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 ;
-
-
+//# sourceMappingURL=pot.js.map
 });
 
 require.register("___globals___", function(exports, require, module) {
@@ -209,3 +209,4 @@ require.register("___globals___", function(exports, require, module) {
 });})();require('___globals___');
 
 require('initialize');
+//# sourceMappingURL=app.js.map
