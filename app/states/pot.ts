@@ -3,8 +3,10 @@ export default function(game: Phaser.Game) {
   let pot: Phaser.Sprite;
   let fade: Phaser.Tween;
   let hover: Phaser.Signal;
+
   let hovering = false;
   let showCross = true;
+  let shattered = false;
 
   let leftGrowth = 0;
   let rightGrowth = 0;
@@ -63,7 +65,9 @@ export default function(game: Phaser.Game) {
               showCross = false;
               hover.dispatch();
             }
-          } else {
+          } else if (!shattered) {
+            shattered = true;
+
             potCross.destroy();
             root.destroy();
             rootLeft.destroy();
