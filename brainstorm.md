@@ -1,14 +1,12 @@
 # Conquest runs out of room to conquest
 
-Self imposed/hubris/self-defeating ambitions/ennui
-
 ## Game mechanic
 
 ...
 
 ## Philosophical impetus
 
-...
+This game could deal with the angst/ennui of life and how people deal with making meaning by imposing goals upon themselves that once fulfilled could leave them with nothing left to do. Potentially could also tackle hubris
 
 # Greenhouse
 
