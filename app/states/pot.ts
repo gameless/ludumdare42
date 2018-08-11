@@ -5,6 +5,8 @@ export default function(game: Phaser.Game) {
       graphics.beginFill(0xffa500);
       graphics.drawCircle(100, 75, 100);
       graphics.endFill();
+
+      game.sound.play('pot_music');
     }
   };
 };

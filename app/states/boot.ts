@@ -1,5 +1,9 @@
 export default function(game: Phaser.Game) {
   return {
+    preload() {
+      game.load.audio('pot_music', 'assets/Audio/Music/LD42TitleMusic.mp3');
+    },
+
     create() {
       game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
       game.scale.setUserScale(7, 7);
