@@ -1,7 +1,10 @@
 export default function(game: Phaser.Game) {
   return {
     create() {
-      game.add.text(0, 0, 'Hello, world!', { fill: 'white' });
+      const graphics = game.add.graphics();
+      graphics.beginFill(0xffa500);
+      graphics.drawCircle(100, 75, 100);
+      graphics.endFill();
     }
   };
 };

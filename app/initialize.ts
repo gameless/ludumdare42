@@ -3,7 +3,9 @@
 import bootState from './states/boot';
 import potState from './states/pot';
 
-const game = new Phaser.Game();
+const game = new Phaser.Game(
+  { width: 160, height: 90, parent: 'parent', antialias: false }
+);
 
 game.state.add('boot', bootState(game));
 game.state.add('pot', potState(game));
