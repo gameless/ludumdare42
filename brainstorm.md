@@ -33,4 +33,6 @@ connections that get run over
 
 ## Philosophical impetus
 
-...
+Empathy is a key factor in the solutions to a wide variety of social problems.
+Cultivating empathy toward people with Alzheimers through playing a game in
+their shoes can foster a more general attitude of empathy.
