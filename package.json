@@ -1,0 +1,18 @@
+{
+  "license": "MIT",
+  "repository": "github:gameless/ludumdare42",
+  "scripts": {
+    "start": "brunch watch --server",
+    "build": "brunch build --production",
+    "test": "tsc --noEmit"
+  },
+  "dependencies": {
+    "phaser-ce": "^2",
+    "typescript": "^3"
+  },
+  "devDependencies": {
+    "auto-reload-brunch": "^2",
+    "brunch": "^2",
+    "typescript-brunch": "^2"
+  }
+}
