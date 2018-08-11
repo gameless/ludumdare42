@@ -4,6 +4,14 @@ export default function(game: Phaser.Game) {
       game.load.audio('pot_music', 'Audio/Music/LD42Fun1.ogg');
       game.load.audio('room_music', 'Audio/Music/LD42Fun2.ogg');
 
+      game.load.audio('root1', 'Audio/SoundEffects/LD42RootGrow1.ogg');
+      game.load.audio('root2', 'Audio/SoundEffects/LD42RootGrow2.ogg');
+      game.load.audio('root3', 'Audio/SoundEffects/LD42RootGrow3.ogg');
+      game.load.audio('root4', 'Audio/SoundEffects/LD42RootGrow4.ogg');
+      game.load.audio('root5', 'Audio/SoundEffects/LD42RootGrow5.ogg');
+      game.load.audio('root6', 'Audio/SoundEffects/LD42RootGrow6.ogg');
+      game.load.audio('root7', 'Audio/SoundEffects/LD42RootGrow7.ogg');
+
       game.load.image('pot_bg', 'Image/scene1/background1withplants.png');
       game.load.image('pot_shelf', 'Image/scene1/shelf.png');
       game.load.image('pot_shelf_hl', 'Image/scene1/shelfhighlighting.png');

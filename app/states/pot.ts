@@ -43,11 +43,13 @@ export default function(game: Phaser.Game) {
         if (hovering) {
           if (game.input.x < 80 && leftGrowth < 4) {
             leftGrowth++;
+            game.sound.play('root' + (leftGrowth + rightGrowth));
             rootLeft.frame = leftGrowth;
           }
 
           if (game.input.x >= 80 && rightGrowth < 3) {
             rightGrowth++;
+            game.sound.play('root' + (leftGrowth + rightGrowth));
             rootRight.frame = rightGrowth;
           }
 
