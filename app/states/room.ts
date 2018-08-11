@@ -11,8 +11,8 @@ export default function(game: Phaser.Game) {
     },
 
     create() {
-      musics['2'].fadeTo(375, 0);
-      musics['3'].fadeTo(375, 1);
+      musics['2'].fadeTo(500, 0);
+      musics['3'].fadeTo(500, 1);
 
       game.add.image(0, 0, 'room_bg');
       game.add.image(0, 0, 'room_vines');
@@ -21,6 +21,12 @@ export default function(game: Phaser.Game) {
       game.add.image(0, 0, 'room_pot');
       game.add.image(0, 0, 'room_plant');
       wall = game.add.image(0, 0, 'room_ext');
+
+      const darken = game.add.graphics();
+      darken.beginFill(0x000000);
+      darken.drawRect(0, 0, 160, 90);
+      darken.endFill();
+      game.add.tween(darken).to({ alpha: 0 }, 500, Phaser.Easing.Default, true);
 
       hover = new Phaser.Signal();
       hover.add(function() {
