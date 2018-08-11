@@ -156,7 +156,8 @@ var game = new Phaser.Game({ width: 160, height: 90, parent: 'parent', antialias
 game.state.add('boot', boot_1.default(game));
 game.state.add('pot', pot_1.default(game));
 game.state.start('boot');
-//# sourceMappingURL=initialize.js.map
+
+
 });
 
 require.register("states/boot.ts", function(exports, require, module) {
@@ -182,7 +183,8 @@ function default_1(game) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 ;
-//# sourceMappingURL=boot.js.map
+
+
 });
 
 require.register("states/pot.ts", function(exports, require, module) {
@@ -201,7 +203,8 @@ function default_1(game) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 ;
-//# sourceMappingURL=pot.js.map
+
+
 });
 
 require.register("___globals___", function(exports, require, module) {
@@ -209,4 +212,3 @@ require.register("___globals___", function(exports, require, module) {
 });})();require('___globals___');
 
 require('initialize');
-//# sourceMappingURL=app.js.map
