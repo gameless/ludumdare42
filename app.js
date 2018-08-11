@@ -166,9 +166,16 @@ function default_1(game) {
     return {
         preload: function () {
             game.load.audio('pot_music', [
-                'Audio/Music/LD42TitleMusic.mp3',
-                'Audio/Music/LD42TitleMusic.ogg'
+                'Audio/Music/LD42Fun1.mp3',
+                'Audio/Music/LD42Fun1.ogg'
             ]);
+            game.load.image('background', 'Image/scene1/background1withplants.png');
+            game.load.image('shelf', 'Image/scene1/shelf.png');
+            game.load.image('pot_cross', 'Image/scene1/pottransparent.png');
+            game.load.image('root', 'Image/scene1/root1.png');
+            game.load.image('pot', 'Image/scene1/pot.png');
+            game.load.image('plant', 'Image/scene1/plant1.png');
+            game.load.image('highlight', 'Image/scene1/highlighting.png');
         },
         create: function () {
             game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
@@ -192,11 +199,14 @@ require.register("states/pot.ts", function(exports, require, module) {
 function default_1(game) {
     return {
         create: function () {
-            var graphics = game.add.graphics();
-            graphics.beginFill(0xffa500);
-            graphics.drawCircle(100, 75, 100);
-            graphics.endFill();
             game.sound.play('pot_music', 1, true);
+            game.add.image(0, 0, 'background');
+            game.add.image(0, 0, 'shelf');
+            game.add.image(0, 0, 'pot_cross');
+            game.add.image(0, 0, 'root');
+            game.add.image(0, 0, 'pot');
+            game.add.image(0, 0, 'plant');
+            game.add.image(0, 0, 'highlight');
         }
     };
 }
