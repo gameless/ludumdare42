@@ -165,10 +165,7 @@ require.register("states/boot.ts", function(exports, require, module) {
 function default_1(game) {
     return {
         preload: function () {
-            game.load.audio('pot_music', [
-                'Audio/Music/LD42Fun1.mp3',
-                'Audio/Music/LD42Fun1.ogg'
-            ]);
+            game.load.audio('pot_music', 'Audio/Music/LD42Fun4.ogg');
             game.load.image('background', 'Image/scene1/background1withplants.png');
             game.load.image('shelf', 'Image/scene1/shelf.png');
             game.load.image('pot_cross', 'Image/scene1/pottransparent.png');
@@ -207,6 +204,10 @@ function default_1(game) {
             game.add.image(0, 0, 'pot');
             game.add.image(0, 0, 'plant');
             game.add.image(0, 0, 'highlight');
+            var graphics = game.add.graphics();
+            graphics.lineStyle(1, 0xff0000);
+            graphics.moveTo(10, 10);
+            graphics.moveTo(20, 15);
         }
     };
 }
