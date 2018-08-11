@@ -1,7 +1,7 @@
 export default function(game: Phaser.Game) {
   return {
     preload() {
-      game.load.audio('pot_music', 'assets/Audio/Music/LD42TitleMusic.mp3');
+      game.load.audio('pot_music', 'Audio/Music/LD42TitleMusic.mp3');
     },
 
     create() {

@@ -6,7 +6,7 @@ export default function(game: Phaser.Game) {
       graphics.drawCircle(100, 75, 100);
       graphics.endFill();
 
-      game.sound.play('pot_music');
+      game.sound.play('pot_music', 1, true);
     }
   };
 };
