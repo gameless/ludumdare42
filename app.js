@@ -152,9 +152,11 @@ require.register("initialize.ts", function(exports, require, module) {
 "use strict";
 var boot_1 = require("./states/boot");
 var pot_1 = require("./states/pot");
+var room_1 = require("./states/room");
 var game = new Phaser.Game({ width: 160, height: 90, parent: 'parent', antialias: false });
 game.state.add('boot', boot_1.default(game));
 game.state.add('pot', pot_1.default(game));
+game.state.add('room', room_1.default(game));
 game.state.start('boot');
 
 
@@ -165,14 +167,22 @@ require.register("states/boot.ts", function(exports, require, module) {
 function default_1(game) {
     return {
         preload: function () {
-            game.load.audio('pot_music', 'Audio/Music/LD42Fun4.ogg');
-            game.load.image('background', 'Image/scene1/background1withplants.png');
-            game.load.image('shelf', 'Image/scene1/shelf.png');
+            game.load.audio('pot_music', 'Audio/Music/LD42Fun1.ogg');
+            game.load.audio('room_music', 'Audio/Music/LD42Fun2.ogg');
+            game.load.image('pot_bg', 'Image/scene1/background1withplants.png');
+            game.load.image('pot_shelf', 'Image/scene1/shelf.png');
             game.load.image('pot_cross', 'Image/scene1/pottransparent.png');
-            game.load.image('root', 'Image/scene1/root1.png');
-            game.load.image('pot', 'Image/scene1/pot.png');
-            game.load.image('plant', 'Image/scene1/plant1.png');
-            game.load.image('highlight', 'Image/scene1/highlighting.png');
+            game.load.image('pot_root', 'Image/scene1/root1.png');
+            game.load.image('pot_pot', 'Image/scene1/pot.png'); // lel
+            game.load.image('pot_plant', 'Image/scene1/plant1.png');
+            game.load.image('pot_highlight', 'Image/scene1/highlighting.png');
+            game.load.image('room_bg', 'Image/scene2/background2.png');
+            game.load.image('room_vines', 'Image/scene2/vines1.png');
+            game.load.image('room_beans', 'Image/scene2/beans1.png');
+            game.load.image('room_int', 'Image/scene2/wallinterior.png');
+            game.load.image('room_pot', 'Image/scene2/brokenpotshards.png');
+            game.load.image('room_plant', 'Image/scene2/plantfallen.png');
+            game.load.image('room_ext', 'Image/scene2/wallexterior.png');
         },
         create: function () {
             game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
@@ -180,7 +190,10 @@ function default_1(game) {
             game.renderer.renderSession.roundPixels = true;
             Phaser.Canvas.setImageRenderingCrisp(game.canvas);
             game.camera.bounds = game.world.bounds;
-            game.state.start('pot');
+            var musics = {};
+            musics['pot'] = game.sound.play('pot_music', 1, true);
+            musics['room'] = game.sound.play('room_music', 0, true);
+            game.state.start('pot', true, false, musics);
         }
     };
 }
@@ -194,20 +207,23 @@ exports.default = default_1;
 require.register("states/pot.ts", function(exports, require, module) {
 "use strict";
 function default_1(game) {
+    var musics;
     var pot;
     var fade;
     var hover;
     var hovering = false;
     return {
+        init: function (theMusics) {
+            musics = theMusics;
+        },
         create: function () {
-            game.sound.play('pot_music', 1, true);
-            game.add.image(0, 0, 'background');
-            game.add.image(0, 0, 'shelf');
+            game.add.image(0, 0, 'pot_bg');
+            game.add.image(0, 0, 'pot_shelf');
             game.add.image(0, 0, 'pot_cross');
-            game.add.image(0, 0, 'root');
-            pot = game.add.image(0, 0, 'pot');
-            game.add.image(0, 0, 'plant');
-            game.add.image(0, 0, 'highlight');
+            game.add.image(0, 0, 'pot_root');
+            pot = game.add.image(0, 0, 'pot_pot');
+            game.add.image(0, 0, 'pot_plant');
+            game.add.image(0, 0, 'pot_highlight');
             hover = new Phaser.Signal();
             hover.add(function () {
                 var newAlpha = hovering ? 0 : 1;
@@ -217,6 +233,11 @@ function default_1(game) {
                 }
                 fade = game.add.tween(pot);
                 fade.to({ alpha: newAlpha }, time, Phaser.Easing.Default, true);
+            });
+            game.input.onDown.add(function () {
+                if (hovering) {
+                    game.state.start('room', true, false, musics);
+                }
             });
         },
         render: function () {
@@ -233,9 +254,66 @@ function default_1(game) {
                 var x = _a[0], y = _a[1];
                 return new Phaser.Point(x, y);
             }));
+            var mouseX = game.input.x;
+            var mouseY = game.input.y;
+            var hoveringNow = closeToPot.contains(mouseX, mouseY);
+            if (hoveringNow !== hovering) {
+                hovering = hoveringNow;
+                hover.dispatch();
+            }
+        }
+    };
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
+;
+
+
+});
+
+require.register("states/room.ts", function(exports, require, module) {
+"use strict";
+function default_1(game) {
+    var musics;
+    var wall;
+    var fade;
+    var hover;
+    var hovering = false;
+    return {
+        init: function (theMusics) {
+            musics = theMusics;
+        },
+        create: function () {
+            musics['pot'].fadeTo(500, 0);
+            musics['room'].fadeTo(500, 1);
+            game.add.image(0, 0, 'room_bg');
+            game.add.image(0, 0, 'room_vines');
+            game.add.image(0, 0, 'room_beans');
+            game.add.image(0, 0, 'room_int');
+            game.add.image(0, 0, 'room_pot');
+            game.add.image(0, 0, 'room_plant');
+            wall = game.add.image(0, 0, 'room_ext');
+            hover = new Phaser.Signal();
+            hover.add(function () {
+                var newAlpha = hovering ? 0 : 1;
+                var time = Math.abs(newAlpha - wall.alpha) * 250;
+                if (fade) {
+                    fade.stop();
+                }
+                fade = game.add.tween(wall);
+                fade.to({ alpha: newAlpha }, time, Phaser.Easing.Default, true);
+            });
+        },
+        render: function () {
+            var closeToWall = new Phaser.Polygon([
+                [25, 15], [135, 15], [135, 85], [25, 85]
+            ].map(function (_a) {
+                var x = _a[0], y = _a[1];
+                return new Phaser.Point(x, y);
+            }));
             var mouseX = game.input.mousePointer.x;
             var mouseY = game.input.mousePointer.y;
-            var hoveringNow = closeToPot.contains(mouseX, mouseY);
+            var hoveringNow = closeToWall.contains(mouseX, mouseY);
             if (hoveringNow !== hovering) {
                 hovering = hoveringNow;
                 hover.dispatch();
