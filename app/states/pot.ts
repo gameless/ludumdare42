@@ -1,20 +1,23 @@
 export default function(game: Phaser.Game) {
+  let musics: { [music: string]: Phaser.Sound };
   let pot: Phaser.Image;
   let fade: Phaser.Tween;
   let hover: Phaser.Signal;
   let hovering = false;
 
   return {
-    create() {
-      game.sound.play('pot_music', 1, true);
+    init(theMusics: { [music: string]: Phaser.Sound }) {
+      musics = theMusics;
+    },
 
-      game.add.image(0, 0, 'background');
-      game.add.image(0, 0, 'shelf');
+    create() {
+      game.add.image(0, 0, 'pot_bg');
+      game.add.image(0, 0, 'pot_shelf');
       game.add.image(0, 0, 'pot_cross');
-      game.add.image(0, 0, 'root');
-      pot = game.add.image(0, 0, 'pot');
-      game.add.image(0, 0, 'plant');
-      game.add.image(0, 0, 'highlight');
+      game.add.image(0, 0, 'pot_root');
+      pot = game.add.image(0, 0, 'pot_pot');
+      game.add.image(0, 0, 'pot_plant');
+      game.add.image(0, 0, 'pot_highlight');
 
       hover = new Phaser.Signal();
       hover.add(function() {
@@ -25,6 +28,12 @@ export default function(game: Phaser.Game) {
         }
         fade = game.add.tween(pot);
         fade.to({ alpha: newAlpha }, time, Phaser.Easing.Default, true);
+      });
+
+      game.input.onDown.add(function() {
+        if (hovering) {
+          game.state.start('room', true, false, musics);
+        }
       });
     },
 
