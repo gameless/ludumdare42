@@ -18,7 +18,7 @@ Cannot remove matter, plants end up competing, toxic chemicals
 
 ## Philosophical impetus
 
-... The will to life is such that it destroys other forms of life in order to persist
+The will to life is such that it destroys other forms of life in order to persist
 
 # Memory loss in mind
 
