@@ -6,11 +6,15 @@ export default function(game: Phaser.Game) {
 
       game.load.image('pot_bg', 'Image/scene1/background1withplants.png');
       game.load.image('pot_shelf', 'Image/scene1/shelf.png');
+      game.load.image('pot_shelf_hl', 'Image/scene1/shelfhighlighting.png');
       game.load.image('pot_cross', 'Image/scene1/pottransparent.png');
       game.load.image('pot_root', 'Image/scene1/root1.png');
-      game.load.image('pot_pot', 'Image/scene1/pot.png'); // lel
+      game.load.image('pot_pot_hl', 'Image/scene1/pothighlighting.png');
       game.load.image('pot_plant', 'Image/scene1/plant1.png');
-      game.load.image('pot_highlight', 'Image/scene1/highlighting.png');
+
+      game.load.spritesheet('pot_pot', 'Image/scene1/potbreaking spritesheet.png', 160, 90);
+      game.load.spritesheet('pot_rootleft', 'Image/scene1/rootleft spritesheet.png', 160, 90);
+      game.load.spritesheet('pot_rootright', 'Image/scene1/rootright spritesheet.png', 160, 90);
 
       game.load.image('room_bg', 'Image/scene2/background2.png');
       game.load.image('room_vines', 'Image/scene2/vines1.png');

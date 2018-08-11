@@ -1,9 +1,13 @@
 export default function(game: Phaser.Game) {
   let musics: { [music: string]: Phaser.Sound };
-  let pot: Phaser.Image;
+  let pot: Phaser.Sprite;
   let fade: Phaser.Tween;
   let hover: Phaser.Signal;
   let hovering = false;
+  let showCross = true;
+
+  let leftGrowth = 0;
+  let rightGrowth = 0;
 
   return {
     init(theMusics: { [music: string]: Phaser.Sound }) {
@@ -13,15 +17,20 @@ export default function(game: Phaser.Game) {
     create() {
       game.add.image(0, 0, 'pot_bg');
       game.add.image(0, 0, 'pot_shelf');
+      game.add.image(0, 0, 'pot_shelf_hl');
       game.add.image(0, 0, 'pot_cross');
+
       game.add.image(0, 0, 'pot_root');
-      pot = game.add.image(0, 0, 'pot_pot');
+      const rootLeft = game.add.sprite(0, 0, 'pot_rootleft');
+      const rootRight = game.add.sprite(0, 0, 'pot_rootright');
+
+      pot = game.add.sprite(0, 0, 'pot_pot');
+      game.add.image(0, 0, 'pot_pot_hl');
       game.add.image(0, 0, 'pot_plant');
-      game.add.image(0, 0, 'pot_highlight');
 
       hover = new Phaser.Signal();
       hover.add(function() {
-        const newAlpha = hovering ? 0 : 1;
+        const newAlpha = (hovering && showCross) ? 0 : 1;
         const time = Math.abs(newAlpha - pot.alpha) * 250;
         if (fade) {
           fade.stop();
@@ -32,7 +41,22 @@ export default function(game: Phaser.Game) {
 
       game.input.onDown.add(function() {
         if (hovering) {
-          game.state.start('room', true, false, musics);
+          if (game.input.x < 80 && leftGrowth < 4) {
+            leftGrowth++;
+            rootLeft.frame = leftGrowth;
+          }
+
+          if (game.input.x >= 80 && rightGrowth < 3) {
+            rightGrowth++;
+            rootRight.frame = rightGrowth;
+          }
+
+          if (leftGrowth === 4 && rightGrowth === 3) {
+            rootRight.frame = rightGrowth + 1;
+            pot.frame = 1;
+            showCross = false;
+            hover.dispatch();
+          }
         }
       });
     },
