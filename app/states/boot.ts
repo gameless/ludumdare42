@@ -1,10 +1,7 @@
 export default function(game: Phaser.Game) {
   return {
     preload() {
-      game.load.audio('pot_music', [
-        'Audio/Music/LD42Fun1.mp3',
-        'Audio/Music/LD42Fun1.ogg'
-      ]);
+      game.load.audio('pot_music', 'Audio/Music/LD42Fun4.ogg');
 
       game.load.image('background', 'Image/scene1/background1withplants.png');
       game.load.image('shelf', 'Image/scene1/shelf.png');
