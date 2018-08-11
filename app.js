@@ -194,6 +194,10 @@ exports.default = default_1;
 require.register("states/pot.ts", function(exports, require, module) {
 "use strict";
 function default_1(game) {
+    var pot;
+    var fade;
+    var hover;
+    var hovering = false;
     return {
         create: function () {
             game.sound.play('pot_music', 1, true);
@@ -201,13 +205,41 @@ function default_1(game) {
             game.add.image(0, 0, 'shelf');
             game.add.image(0, 0, 'pot_cross');
             game.add.image(0, 0, 'root');
-            game.add.image(0, 0, 'pot');
+            pot = game.add.image(0, 0, 'pot');
             game.add.image(0, 0, 'plant');
             game.add.image(0, 0, 'highlight');
-            var graphics = game.add.graphics();
-            graphics.lineStyle(1, 0xff0000);
-            graphics.moveTo(10, 10);
-            graphics.moveTo(20, 15);
+            hover = new Phaser.Signal();
+            hover.add(function () {
+                var newAlpha = hovering ? 0 : 1;
+                var time = Math.abs(newAlpha - pot.alpha) * 250;
+                if (fade) {
+                    fade.stop();
+                }
+                fade = game.add.tween(pot);
+                fade.to({ alpha: newAlpha }, time, Phaser.Easing.Default, true);
+            });
+        },
+        render: function () {
+            var closeToPot = new Phaser.Polygon([
+                [37, 44],
+                [50, 81],
+                [67, 86],
+                [89, 86],
+                [105, 80],
+                [114, 44],
+                [100, 33],
+                [50, 33]
+            ].map(function (_a) {
+                var x = _a[0], y = _a[1];
+                return new Phaser.Point(x, y);
+            }));
+            var mouseX = game.input.mousePointer.x;
+            var mouseY = game.input.mousePointer.y;
+            var hoveringNow = closeToPot.contains(mouseX, mouseY);
+            if (hoveringNow !== hovering) {
+                hovering = hoveringNow;
+                hover.dispatch();
+            }
         }
     };
 }
