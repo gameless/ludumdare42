@@ -7,14 +7,14 @@ itself out.
 
 You keep having to break out of a series of ever-larger enclosures:
 - pot
-- coldframe
+- room dividers
 - greenhouse
 - stone wall
 - village moat
 - island
 - different climates
-- planets!
-- GALAXIES oH mY gOsH
+- whole planet
+- and then you die
 
 The way you control your plant colony is by stimulating or preventing growth in
 different places. As you find and assimilate other species of plants, you can
