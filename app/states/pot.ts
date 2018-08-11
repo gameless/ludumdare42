@@ -57,8 +57,8 @@ export default function(game: Phaser.Game) {
             }
 
             if (leftGrowth === 4 && rightGrowth === 3) {
-              musics['pot'].fadeTo(500, 0);
-              musics['room'].fadeTo(500, 1);
+              musics['1'].fadeTo(375, 0);
+              musics['2'].fadeTo(375, 1);
 
               rootRight.frame = rightGrowth + 1;
               pot.frame = 1;

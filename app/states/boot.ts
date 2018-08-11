@@ -1,8 +1,9 @@
 export default function(game: Phaser.Game) {
   return {
     preload() {
-      game.load.audio('pot_music', 'Audio/Music/LD42Fun1.ogg');
-      game.load.audio('room_music', 'Audio/Music/LD42Fun2.ogg');
+      game.load.audio('music1', 'Audio/Music/LD42Fun1.ogg');
+      game.load.audio('music2', 'Audio/Music/LD42Fun2.ogg');
+      game.load.audio('music3', 'Audio/Music/LD42Fun3.ogg');
 
       game.load.audio('root1', 'Audio/SoundEffects/LD42RootGrow1.ogg');
       game.load.audio('root2', 'Audio/SoundEffects/LD42RootGrow2.ogg');
@@ -56,8 +57,9 @@ export default function(game: Phaser.Game) {
       game.camera.bounds = game.world.bounds;
 
       const musics: { [music: string]: Phaser.Sound } = {};
-      musics['pot'] = game.sound.play('pot_music', 1, true);
-      musics['room'] = game.sound.play('room_music', 0, true);
+      musics['1'] = game.sound.play('music1', 1, true);
+      musics['2'] = game.sound.play('music2', 0, true);
+      musics['3'] = game.sound.play('music3', 0, true);
 
       game.state.start('pot', true, false, musics);
     }

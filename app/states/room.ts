@@ -11,6 +11,9 @@ export default function(game: Phaser.Game) {
     },
 
     create() {
+      musics['2'].fadeTo(375, 0);
+      musics['3'].fadeTo(375, 1);
+
       game.add.image(0, 0, 'room_bg');
       game.add.image(0, 0, 'room_vines');
       game.add.image(0, 0, 'room_beans');
