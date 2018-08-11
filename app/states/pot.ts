@@ -49,9 +49,7 @@ export default function(game: Phaser.Game) {
         [50, 33]
       ].map(([x, y]) => new Phaser.Point(x, y)));
 
-      const mouseX = game.input.x;
-      const mouseY = game.input.y;
-      const hoveringNow = closeToPot.contains(mouseX, mouseY);
+      const hoveringNow = closeToPot.contains(game.input.x, game.input.y);
       if (hoveringNow !== hovering) {
         hovering = hoveringNow;
         hover.dispatch();
