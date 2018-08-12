@@ -255,7 +255,7 @@ function default_1(game) {
             musics.push(game.sound.play('music3', 0, true));
             musics.push(game.sound.play('music4', 0, true));
             musics.push(game.sound.play('music5', 0, true));
-            game.state.start('room', true, false, musics);
+            game.state.start('menu', true, false, musics);
         }
     };
 }
