@@ -151,11 +151,13 @@ require.register("initialize.ts", function(exports, require, module) {
 /// <reference path="../node_modules/phaser-ce/typescript/phaser.d.ts"/>
 "use strict";
 var boot_1 = require("./states/boot");
+var menu_1 = require("./states/menu");
 var pot_1 = require("./states/pot");
 var room_1 = require("./states/room");
 var planet_1 = require("./states/planet");
 var game = new Phaser.Game({ width: 160, height: 90, parent: 'parent', antialias: false });
 game.state.add('boot', boot_1.default(game));
+game.state.add('menu', menu_1.default(game));
 game.state.add('pot', pot_1.default(game));
 game.state.add('room', room_1.default(game));
 game.state.add('planet', planet_1.default(game));
@@ -175,11 +177,15 @@ function default_1(game) {
     }
     return {
         preload: function () {
+            loadAudio('music0', 'Music/TitleMusic');
             loadAudio('music1', 'Music/Fun1');
             loadAudio('music2', 'Music/Fun2');
             loadAudio('music3', 'Music/Fun3');
             loadAudio('music4', 'Music/Fun4');
             loadAudio('music5', 'Music/LongEndHalfWhirr');
+            game.load.image('menu_background', 'Image/menu/startmenubackground.png');
+            game.load.image('menu_start', 'Image/menu/startmenu.png');
+            game.load.image('menu_resume', 'Image/menu/resumenu.png');
             game.load.image('toolbar', 'Image/scene2/toolbar.png');
             game.load.image('toolbar_orig', 'Image/scene2/planticon (1,2).png');
             game.load.image('toolbar_bean', 'Image/scene2/beanicon (12,1).png');
@@ -242,12 +248,35 @@ function default_1(game) {
             Phaser.Canvas.setImageRenderingCrisp(game.canvas);
             game.camera.bounds = game.world.bounds;
             var musics = [];
-            musics.push(game.sound.play('music1', 1, true));
+            musics.push(game.sound.play('music0', 1, true));
+            musics.push(game.sound.play('music1', 0, true));
             musics.push(game.sound.play('music2', 0, true));
             musics.push(game.sound.play('music3', 0, true));
             musics.push(game.sound.play('music4', 0, true));
             musics.push(game.sound.play('music5', 0, true));
-            game.state.start('pot', true, false, musics);
+            game.state.start('menu', true, false, musics);
+        }
+    };
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
+;
+
+
+});
+
+require.register("states/menu.ts", function(exports, require, module) {
+"use strict";
+function default_1(game) {
+    var musics;
+    return {
+        init: function (theMusics) {
+            musics = theMusics;
+        },
+        create: function () {
+            game.add.image(0, 0, 'menu_background');
+            game.add.image(0, 0, 'menu_start');
+            game.input.onDown.add(function () { return game.state.start('pot', true, false, musics); });
         }
     };
 }
@@ -271,7 +300,8 @@ function default_1(game) {
             musics[1].fadeTo(500, 0);
             musics[2].fadeTo(500, 0);
             musics[3].fadeTo(500, 0);
-            musics[4].fadeTo(500, 1);
+            musics[4].fadeTo(500, 0);
+            musics[5].fadeTo(500, 1);
             game.add.image(0, 0, 'room_bg'); // temporary
             var darken = game.add.graphics();
             darken.beginFill(0x000000);
@@ -305,6 +335,8 @@ function default_1(game) {
             musics = theMusics;
         },
         create: function () {
+            musics[0].fadeTo(500, 0);
+            musics[1].fadeTo(500, 1);
             game.add.image(0, 0, 'pot_bg');
             game.add.image(0, 0, 'pot_shelf');
             game.add.image(0, 0, 'pot_shelf_hl');
@@ -339,8 +371,8 @@ function default_1(game) {
                             rootRight.frame = rightGrowth;
                         }
                         if (leftGrowth === 4 && rightGrowth === 3) {
-                            musics[0].fadeTo(500, 0);
-                            musics[1].fadeTo(500, 1);
+                            musics[1].fadeTo(500, 0);
+                            musics[2].fadeTo(500, 1);
                             pot_hl.destroy();
                             rootRight.frame = rightGrowth + 1;
                             pot.frame = 1;
@@ -455,7 +487,8 @@ function default_1(game) {
         create: function () {
             musics[0].fadeTo(500, 0);
             musics[1].fadeTo(500, 0);
-            musics[2].fadeTo(500, 1);
+            musics[2].fadeTo(500, 0);
+            musics[3].fadeTo(500, 1);
             game.add.image(0, 0, 'room_bg');
             var vines = game.add.sprite(0, 0, 'room_vines');
             var beanLeft = game.add.sprite(0, 0, 'room_beanleft');
@@ -537,8 +570,8 @@ function default_1(game) {
                             setupTool(toolOrig, function (x, y) {
                                 var vine = new Phaser.Rectangle(82, 40, 12, 12);
                                 if (beanRight.frame < 1 && vine.contains(x, y)) {
-                                    musics[2].fadeTo(500, 0);
-                                    musics[3].fadeTo(500, 1);
+                                    musics[3].fadeTo(500, 0);
+                                    musics[4].fadeTo(500, 1);
                                     vines.frame = 1;
                                     game.add.tween(toolVine).to({ alpha: 1 }, 500).start();
                                     setupTool(toolVine, function (x, y) {
