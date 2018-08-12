@@ -27,6 +27,11 @@ You keep having to break out of a series of ever-larger enclosures:
 - whole planet animation (not level)
   - Play ShortEnd.ogg or LongEnd.ogg depending on animation
   - Plant spreads across planet and then dies
+  - Clip 1: Plant crawls across planet
+  - Clip 2: Shot of blood dripping from plant and planet
+    - While dripping, plant thrashes around, cracks planet
+  - Clip 3: Plant withers
+  - Fade to black
 
 The way you control your plant colony is by stimulating or preventing growth in
 different places. As you find and assimilate other species of plants, you can
