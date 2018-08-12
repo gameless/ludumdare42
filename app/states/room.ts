@@ -37,7 +37,7 @@ export default function(game: Phaser.Game) {
       hover = new Phaser.Signal();
       const timer = game.time.create();
       timer.add(1000, () => {
-        game.sound.play('thud', 4);
+        game.sound.play('thud', 5);
         hover.add(function() {
           const newAlpha = hovering ? 0 : 1;
           const time = Math.abs(newAlpha - wall.alpha) * 250;

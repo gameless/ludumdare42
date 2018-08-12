@@ -68,7 +68,7 @@ export default function(game: Phaser.Game) {
       musics['2'] = game.sound.play('music2', 0, true);
       musics['3'] = game.sound.play('music3', 0, true);
 
-      game.state.start('room', true, false, musics);
+      game.state.start('pot', true, false, musics);
     }
   };
 };
