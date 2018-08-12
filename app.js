@@ -170,6 +170,10 @@ function default_1(game) {
             game.load.audio('music1', 'Audio/Music/Fun1.ogg');
             game.load.audio('music2', 'Audio/Music/Fun2.ogg');
             game.load.audio('music3', 'Audio/Music/Fun3.ogg');
+            game.load.image('toolbar', 'Image/scene2/toolbar.png');
+            game.load.image('toolbar_orig', 'Image/scene2/planticon (1,2).png');
+            game.load.image('toolbar_bean', 'Image/scene2/beanicon (12,1).png');
+            game.load.image('toolbar_vine', 'Image/scene2/vineicon (22,3).png');
             game.load.audio('root1', 'Audio/SoundEffects/RootGrow1.ogg');
             game.load.audio('root2', 'Audio/SoundEffects/RootGrow2.ogg');
             game.load.audio('root3', 'Audio/SoundEffects/RootGrow3.ogg');
@@ -209,7 +213,9 @@ function default_1(game) {
             game.load.image('room_pot', 'Image/scene2/brokenpotshards.png');
             game.load.image('room_ext', 'Image/scene2/wallexterior.png');
             game.load.spritesheet('room_vines', 'Image/scene2/vine spritesheet.png', 160, 90);
-            game.load.spritesheet('room_beans', 'Image/scene2/bean spritesheet.png', 160, 90);
+            game.load.spritesheet('room_beanleft', 'Image/scene2/beanleft spritesheet.png', 160, 90);
+            game.load.spritesheet('room_beanright', 'Image/scene2/beanright spritesheet.png', 160, 90);
+            game.load.spritesheet('room_otherbeans', 'Image/scene2/otherbeans spritesheet.png', 160, 90);
             game.load.spritesheet('room_plant', 'Image/scene2/plantfall spritesheet.png', 160, 90);
         },
         create: function () {
@@ -222,7 +228,7 @@ function default_1(game) {
             musics['1'] = game.sound.play('music1', 1, true);
             musics['2'] = game.sound.play('music2', 0, true);
             musics['3'] = game.sound.play('music3', 0, true);
-            game.state.start('room', true, false, musics);
+            game.state.start('pot', true, false, musics);
         }
     };
 }
@@ -391,6 +397,7 @@ function default_1(game) {
     var fade;
     var hover;
     var hovering = true;
+    var ateBean = false;
     return {
         init: function (theMusics) {
             musics = theMusics;
@@ -400,12 +407,32 @@ function default_1(game) {
             musics['3'].fadeTo(500, 1);
             game.add.image(0, 0, 'room_bg');
             game.add.sprite(0, 0, 'room_vines');
-            game.add.sprite(0, 0, 'room_beans');
+            var beanLeft = game.add.sprite(0, 0, 'room_beanleft');
+            var beanRight = game.add.sprite(0, 0, 'room_beanright');
+            var otherBeans = game.add.sprite(0, 0, 'room_otherbeans');
             game.add.image(0, 0, 'room_int');
             game.add.image(0, 0, 'room_pot');
             var plant = game.add.sprite(0, 0, 'room_plant');
             wall = game.add.image(0, 0, 'room_ext');
             wall.alpha = 0;
+            var toolbar = game.add.image(0, 0, 'toolbar');
+            var toolOrig = game.add.image(1, 2, 'toolbar_orig');
+            var toolBean = game.add.image(12, 1, 'toolbar_bean');
+            var toolVine = game.add.image(22, 3, 'toolbar_vine');
+            toolbar.alpha = 0;
+            toolOrig.alpha = 0;
+            toolBean.alpha = 0;
+            toolVine.alpha = 0;
+            function setupTool(tool) {
+                var initialX = tool.x;
+                var initialY = tool.y;
+                tool.inputEnabled = true;
+                tool.input.enableDrag();
+                tool.events.onDragStop.add(function () {
+                    tool.x = initialX;
+                    tool.y = initialY;
+                });
+            }
             var darken = game.add.graphics();
             darken.beginFill(0x000000);
             darken.drawRect(0, 0, 160, 90);
@@ -416,7 +443,7 @@ function default_1(game) {
             hover = new Phaser.Signal();
             var timer = game.time.create();
             timer.add(1000, function () {
-                game.sound.play('thud', 4);
+                game.sound.play('thud', 5);
                 hover.add(function () {
                     var newAlpha = hovering ? 0 : 1;
                     var time = Math.abs(newAlpha - wall.alpha) * 250;
@@ -425,6 +452,39 @@ function default_1(game) {
                     }
                     fade = game.add.tween(wall);
                     fade.to({ alpha: newAlpha }, time, Phaser.Easing.Default, true);
+                });
+                game.input.onDown.add(function () {
+                    if (!ateBean) {
+                        var leftBean = new Phaser.Rectangle(53, 53, 8, 15);
+                        var rightBean = new Phaser.Rectangle(73, 53, 8, 15);
+                        if (leftBean.contains(game.input.x, game.input.y)) {
+                            ateBean = true;
+                            beanLeft.frame = 1;
+                        }
+                        else if (rightBean.contains(game.input.x, game.input.y)) {
+                            ateBean = true;
+                            beanRight.frame = 1;
+                        }
+                        if (ateBean) {
+                            var beanTimer = game.time.create();
+                            beanTimer.add(250, function () {
+                                beanLeft.frame = 1;
+                                beanRight.frame = 1;
+                            });
+                            beanTimer.start();
+                            otherBeans.animations.add('shrink').play(8);
+                            var baseTween = game.add.tween(toolbar);
+                            var origTween = game.add.tween(toolOrig);
+                            var beanTween = game.add.tween(toolBean); // lel
+                            baseTween.to({ alpha: 1 }, 500);
+                            origTween.to({ alpha: 1 }, 500);
+                            beanTween.to({ alpha: 1 }, 500);
+                            baseTween.chain(origTween, beanTween);
+                            baseTween.start();
+                            setupTool(toolOrig);
+                            setupTool(toolBean);
+                        }
+                    }
                 });
             });
             timer.start();
