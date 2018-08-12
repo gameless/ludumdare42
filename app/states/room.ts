@@ -6,6 +6,7 @@ export default function(game: Phaser.Game) {
   let hovering = true;
 
   let ateBean = false;
+  let growths = 0;
 
   return {
     init(theMusics: Phaser.Sound[]) {
@@ -85,6 +86,8 @@ export default function(game: Phaser.Game) {
               beanRight.frame = 1;
             }
             if (ateBean) {
+              game.sound.play('bean', 3);
+
               const beanTimer = game.time.create();
               beanTimer.add(250, () => {
                 beanLeft.frame = 1;
@@ -105,13 +108,20 @@ export default function(game: Phaser.Game) {
               setupTool(toolOrig, (x, y) => {
                 const vine = new Phaser.Rectangle(82, 40, 12, 12);
                 if (beanRight.frame < 1 && vine.contains(x, y)) {
+                  musics[2].fadeTo(500, 0);
+                  musics[3].fadeTo(500, 1);
+
                   vines.frame = 1;
                 }
               });
               setupTool(toolBean, (x, y) => {
                 if (leftBean.contains(x, y)) {
+                  growths++;
+                  game.sound.play('grow' + growths);
                   beanLeft.frame = 0;
                 } else if (rightBean.contains(x, y)) {
+                  growths++;
+                  game.sound.play('grow' + growths);
                   beanRight.frame = 0;
                 }
               });

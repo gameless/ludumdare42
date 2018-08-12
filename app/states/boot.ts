@@ -11,6 +11,7 @@ export default function(game: Phaser.Game) {
       loadAudio('music1', 'Music/Fun1');
       loadAudio('music2', 'Music/Fun2');
       loadAudio('music3', 'Music/Fun3');
+      loadAudio('music4', 'Music/Fun4');
 
       game.load.image('toolbar', 'Image/scene2/toolbar.png');
       game.load.image('toolbar_orig', 'Image/scene2/planticon (1,2).png');
@@ -56,6 +57,13 @@ export default function(game: Phaser.Game) {
       game.load.spritesheet('pot_rootright', 'Image/scene1/rootright spritesheet.png', 160, 90);
 
       loadAudio('thud', 'SoundEffects/Thud');
+      loadAudio('bean', 'SoundEffects/BeanPlant');
+      loadAudio('grow1', 'SoundEffects/Grow1');
+      loadAudio('grow2', 'SoundEffects/Grow2');
+      loadAudio('grow3', 'SoundEffects/Grow3');
+      loadAudio('grow4', 'SoundEffects/Grow4');
+      loadAudio('grow5', 'SoundEffects/Grow5');
+      loadAudio('grow6', 'SoundEffects/Grow6');
 
       game.load.image('room_bg', 'Image/scene2/background2.png');
       game.load.image('room_int', 'Image/scene2/wallinterior.png');
@@ -81,6 +89,7 @@ export default function(game: Phaser.Game) {
       musics.push(game.sound.play('music1', 1, true));
       musics.push(game.sound.play('music2', 0, true));
       musics.push(game.sound.play('music3', 0, true));
+      musics.push(game.sound.play('music4', 0, true));
 
       game.state.start('pot', true, false, musics);
     }
