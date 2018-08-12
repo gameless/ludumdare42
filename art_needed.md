@@ -1,16 +1,16 @@
 Art Needed
 ==========
 
-Scene 1
--------
+Pot
+---
 
 - blood spritesheet
   - (if this results in layering issues then I also need a new pot exterior
     spritesheet)
 - plant withering spritesheet
 
-Scene 2
--------
+Room
+----
 
 - more frames in the plant spritesheet:
   - reaching out to the left or right to grab the bean plants
@@ -30,7 +30,9 @@ Scene 2
     animation for reaching out to grab the vine
 - one or two spritesheets for the vines the player can grow
 
-Other Scenes
-------------
+Planet
+------
 
-...
+- spritesheet for the whole animation
+  - we probably don't need to split anything up here
+  - except maybe the background (space)
