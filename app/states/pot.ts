@@ -17,6 +17,9 @@ export default function(game: Phaser.Game) {
     },
 
     create() {
+      musics[0].fadeTo(500, 0);
+      musics[1].fadeTo(500, 1);
+
       game.add.image(0, 0, 'pot_bg');
       game.add.image(0, 0, 'pot_shelf');
       game.add.image(0, 0, 'pot_shelf_hl');
@@ -57,8 +60,8 @@ export default function(game: Phaser.Game) {
             }
 
             if (leftGrowth === 4 && rightGrowth === 3) {
-              musics[0].fadeTo(500, 0);
-              musics[1].fadeTo(500, 1);
+              musics[1].fadeTo(500, 0);
+              musics[2].fadeTo(500, 1);
 
               pot_hl.destroy();
               rootRight.frame = rightGrowth + 1;

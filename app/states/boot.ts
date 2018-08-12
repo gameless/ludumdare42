@@ -8,11 +8,16 @@ export default function(game: Phaser.Game) {
 
   return {
     preload() {
+      loadAudio('music0', 'Music/TitleMusic');
       loadAudio('music1', 'Music/Fun1');
       loadAudio('music2', 'Music/Fun2');
       loadAudio('music3', 'Music/Fun3');
       loadAudio('music4', 'Music/Fun4');
       loadAudio('music5', 'Music/LongEndHalfWhirr');
+
+      game.load.image('menu_background', 'Image/menu/startmenubackground.png');
+      game.load.image('menu_start', 'Image/menu/startmenu.png');
+      game.load.image('menu_resume', 'Image/menu/resumenu.png');
 
       game.load.image('toolbar', 'Image/scene2/toolbar.png');
       game.load.image('toolbar_orig', 'Image/scene2/planticon (1,2).png');
@@ -87,13 +92,14 @@ export default function(game: Phaser.Game) {
       game.camera.bounds = game.world.bounds;
 
       const musics: Phaser.Sound[] = [];
-      musics.push(game.sound.play('music1', 1, true));
+      musics.push(game.sound.play('music0', 1, true));
+      musics.push(game.sound.play('music1', 0, true));
       musics.push(game.sound.play('music2', 0, true));
       musics.push(game.sound.play('music3', 0, true));
       musics.push(game.sound.play('music4', 0, true));
       musics.push(game.sound.play('music5', 0, true));
 
-      game.state.start('pot', true, false, musics);
+      game.state.start('menu', true, false, musics);
     }
   };
 };

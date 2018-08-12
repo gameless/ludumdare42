@@ -16,7 +16,8 @@ export default function(game: Phaser.Game) {
     create() {
       musics[0].fadeTo(500, 0);
       musics[1].fadeTo(500, 0);
-      musics[2].fadeTo(500, 1);
+      musics[2].fadeTo(500, 0);
+      musics[3].fadeTo(500, 1);
 
       game.add.image(0, 0, 'room_bg');
       const vines = game.add.sprite(0, 0, 'room_vines');
@@ -108,8 +109,8 @@ export default function(game: Phaser.Game) {
               setupTool(toolOrig, (x, y) => {
                 const vine = new Phaser.Rectangle(82, 40, 12, 12);
                 if (beanRight.frame < 1 && vine.contains(x, y)) {
-                  musics[2].fadeTo(500, 0);
-                  musics[3].fadeTo(500, 1);
+                  musics[3].fadeTo(500, 0);
+                  musics[4].fadeTo(500, 1);
 
                   vines.frame = 1;
 

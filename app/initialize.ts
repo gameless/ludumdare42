@@ -1,6 +1,7 @@
 /// <reference path="../node_modules/phaser-ce/typescript/phaser.d.ts"/>
 
 import bootState from './states/boot';
+import menuState from './states/menu';
 import potState from './states/pot';
 import roomState from './states/room';
 import planetState from './states/planet';
@@ -10,6 +11,7 @@ const game = new Phaser.Game(
 );
 
 game.state.add('boot', bootState(game));
+game.state.add('menu', menuState(game));
 game.state.add('pot', potState(game));
 game.state.add('room', roomState(game));
 game.state.add('planet', planetState(game));
