@@ -3,7 +3,7 @@ export default function(game: Phaser.Game) {
   let wall: Phaser.Image;
   let fade: Phaser.Tween;
   let hover: Phaser.Signal;
-  let hovering = false;
+  let hovering = true;
 
   return {
     init(theMusics: { [music: string]: Phaser.Sound }) {
@@ -15,12 +15,13 @@ export default function(game: Phaser.Game) {
       musics['3'].fadeTo(500, 1);
 
       game.add.image(0, 0, 'room_bg');
-      game.add.image(0, 0, 'room_vines');
-      game.add.image(0, 0, 'room_beans');
+      game.add.sprite(0, 0, 'room_vines');
+      game.add.sprite(0, 0, 'room_beans');
       game.add.image(0, 0, 'room_int');
       game.add.image(0, 0, 'room_pot');
-      game.add.image(0, 0, 'room_plant');
+      const plant = game.add.sprite(0, 0, 'room_plant');
       wall = game.add.image(0, 0, 'room_ext');
+      wall.alpha = 0;
 
       const darken = game.add.graphics();
       darken.beginFill(0x000000);
@@ -28,16 +29,24 @@ export default function(game: Phaser.Game) {
       darken.endFill();
       game.add.tween(darken).to({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
 
+      plant.animations.add('fall');
+      plant.animations.play('fall', 2);
+
       hover = new Phaser.Signal();
-      hover.add(function() {
-        const newAlpha = hovering ? 0 : 1;
-        const time = Math.abs(newAlpha - wall.alpha) * 250;
-        if (fade) {
-          fade.stop();
-        }
-        fade = game.add.tween(wall);
-        fade.to({ alpha: newAlpha }, time, Phaser.Easing.Default, true);
+      const timer = game.time.create();
+      timer.add(1000, () => {
+        game.sound.play('thud');
+        hover.add(function() {
+          const newAlpha = hovering ? 0 : 1;
+          const time = Math.abs(newAlpha - wall.alpha) * 250;
+          if (fade) {
+            fade.stop();
+          }
+          fade = game.add.tween(wall);
+          fade.to({ alpha: newAlpha }, time, Phaser.Easing.Default, true);
+        });
       });
+      timer.start();
     },
 
     update() {
