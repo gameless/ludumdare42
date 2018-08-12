@@ -18,7 +18,9 @@ export default function(game: Phaser.Game) {
 
       game.add.image(0, 0, 'room_bg');
       game.add.sprite(0, 0, 'room_vines');
-      const beans = game.add.sprite(0, 0, 'room_beans');
+      const beanLeft = game.add.sprite(0, 0, 'room_beanleft');
+      const beanRight = game.add.sprite(0, 0, 'room_beanright');
+      const otherBeans = game.add.sprite(0, 0, 'room_otherbeans');
       game.add.image(0, 0, 'room_int');
       game.add.image(0, 0, 'room_pot');
       const plant = game.add.sprite(0, 0, 'room_plant');
@@ -26,20 +28,23 @@ export default function(game: Phaser.Game) {
       wall.alpha = 0;
 
       const toolbar = game.add.image(0, 0, 'toolbar');
-      const toolOrig = game.add.image(0, 0, 'toolbar_orig');
-      const toolBean = game.add.image(0, 0, 'toolbar_bean');
-      const toolVine = game.add.image(0, 0, 'toolbar_vine');
+      const toolOrig = game.add.image(1, 2, 'toolbar_orig');
+      const toolBean = game.add.image(12, 1, 'toolbar_bean');
+      const toolVine = game.add.image(22, 3, 'toolbar_vine');
       toolbar.alpha = 0;
       toolOrig.alpha = 0;
       toolBean.alpha = 0;
       toolVine.alpha = 0;
 
       function setupTool(tool: Phaser.Image) {
+        const initialX = tool.x;
+        const initialY = tool.y;
+
         tool.inputEnabled = true;
         tool.input.enableDrag();
         tool.events.onDragStop.add(() => {
-          tool.x = 0;
-          tool.y = 0;
+          tool.x = initialX;
+          tool.y = initialY;
         });
       }
 
@@ -72,15 +77,19 @@ export default function(game: Phaser.Game) {
             const rightBean = new Phaser.Rectangle(73, 53, 8, 15);
             if (leftBean.contains(game.input.x, game.input.y)) {
               ateBean = true;
-              beans.frame = 1;
+              beanLeft.frame = 1;
             } else if (rightBean.contains(game.input.x, game.input.y)) {
               ateBean = true;
-              beans.frame = 2;
+              beanRight.frame = 1;
             }
             if (ateBean) {
               const beanTimer = game.time.create();
-              beanTimer.add(250, () => beans.frame = 3)
+              beanTimer.add(250, () => {
+                beanLeft.frame = 1;
+                beanRight.frame = 1;
+              });
               beanTimer.start();
+              otherBeans.animations.add('shrink').play(8);
 
               const baseTween = game.add.tween(toolbar);
               const origTween = game.add.tween(toolOrig);
