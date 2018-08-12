@@ -5,6 +5,11 @@ export default function(game: Phaser.Game) {
       game.load.audio('music2', 'Audio/Music/Fun2.ogg');
       game.load.audio('music3', 'Audio/Music/Fun3.ogg');
 
+      game.load.image('toolbar', 'Image/scene2/toolbar.png');
+      game.load.image('toolbar_orig', 'Image/scene2/origplanticon.png');
+      game.load.image('toolbar_bean', 'Image/scene2/beanicon.png');
+      game.load.image('toolbar_vine', 'Image/scene2/vineicon.png');
+
       game.load.audio('root1', 'Audio/SoundEffects/RootGrow1.ogg');
       game.load.audio('root2', 'Audio/SoundEffects/RootGrow2.ogg');
       game.load.audio('root3', 'Audio/SoundEffects/RootGrow3.ogg');

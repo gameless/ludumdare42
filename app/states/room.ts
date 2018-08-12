@@ -25,6 +25,15 @@ export default function(game: Phaser.Game) {
       wall = game.add.image(0, 0, 'room_ext');
       wall.alpha = 0;
 
+      const toolbar = game.add.image(0, 0, 'toolbar');
+      const toolOrig = game.add.image(0, 0, 'toolbar_orig');
+      const toolBean = game.add.image(0, 0, 'toolbar_bean');
+      const toolVine = game.add.image(0, 0, 'toolbar_vine');
+      toolbar.alpha = 0;
+      toolOrig.alpha = 0;
+      toolBean.alpha = 0;
+      toolVine.alpha = 0;
+
       const darken = game.add.graphics();
       darken.beginFill(0x000000);
       darken.drawRect(0, 0, 160, 90);
@@ -63,6 +72,15 @@ export default function(game: Phaser.Game) {
               const beanTimer = game.time.create();
               beanTimer.add(500, () => beans.frame = 3)
               beanTimer.start();
+
+              const baseTween = game.add.tween(toolbar);
+              const origTween = game.add.tween(toolOrig);
+              const beanTween = game.add.tween(toolBean); // lel
+              baseTween.to({ alpha: 1 }, 500);
+              origTween.to({ alpha: 1 }, 500);
+              beanTween.to({ alpha: 1 }, 500);
+              baseTween.chain(origTween, beanTween);
+              baseTween.start();
             }
           }
         });
