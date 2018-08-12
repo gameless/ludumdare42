@@ -34,6 +34,15 @@ export default function(game: Phaser.Game) {
       toolBean.alpha = 0;
       toolVine.alpha = 0;
 
+      function setupTool(tool: Phaser.Image) {
+        tool.inputEnabled = true;
+        tool.input.enableDrag();
+        tool.events.onDragStop.add(() => {
+          tool.x = 0;
+          tool.y = 0;
+        });
+      }
+
       const darken = game.add.graphics();
       darken.beginFill(0x000000);
       darken.drawRect(0, 0, 160, 90);
@@ -70,7 +79,7 @@ export default function(game: Phaser.Game) {
             }
             if (ateBean) {
               const beanTimer = game.time.create();
-              beanTimer.add(500, () => beans.frame = 3)
+              beanTimer.add(250, () => beans.frame = 3)
               beanTimer.start();
 
               const baseTween = game.add.tween(toolbar);
@@ -81,6 +90,9 @@ export default function(game: Phaser.Game) {
               beanTween.to({ alpha: 1 }, 500);
               baseTween.chain(origTween, beanTween);
               baseTween.start();
+
+              setupTool(toolOrig);
+              setupTool(toolBean);
             }
           }
         });
