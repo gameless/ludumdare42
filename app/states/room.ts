@@ -109,6 +109,8 @@ export default function(game: Phaser.Game) {
               setupTool(toolOrig, (x, y) => {
                 const vine = new Phaser.Rectangle(82, 40, 12, 12);
                 if (beanRight.frame < 1 && vine.contains(x, y)) {
+                  game.sound.play('snap');
+
                   musics[3].fadeTo(500, 0);
                   musics[4].fadeTo(500, 1);
 

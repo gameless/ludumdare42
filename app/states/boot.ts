@@ -70,6 +70,7 @@ export default function(game: Phaser.Game) {
       loadAudio('grow4', 'SoundEffects/Grow4');
       loadAudio('grow5', 'SoundEffects/Grow5');
       loadAudio('grow6', 'SoundEffects/Grow6');
+      loadAudio('snap', 'SoundEffects/VineSnap');
 
       game.load.image('room_bg', 'Image/scene2/background2.png');
       game.load.image('room_int', 'Image/scene2/wallinterior.png');
