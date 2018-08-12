@@ -113,7 +113,7 @@ export default function(game: Phaser.Game) {
       });
     },
 
-    render() {
+    update() {
       const closeToPot = new Phaser.Polygon([
         [37, 44],
         [50, 81],

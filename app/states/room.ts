@@ -40,7 +40,7 @@ export default function(game: Phaser.Game) {
       });
     },
 
-    render() {
+    update() {
       const closeToWall = new Phaser.Polygon([
         [25, 15], [135, 15], [135, 85], [25, 85]
       ].map(([x, y]) => new Phaser.Point(x, y)));
