@@ -177,7 +177,8 @@ function default_1(game) {
             game.load.audio('root5', 'Audio/SoundEffects/LD42RootGrow5.ogg');
             game.load.audio('root6', 'Audio/SoundEffects/LD42RootGrow6.ogg');
             game.load.audio('root7', 'Audio/SoundEffects/LD42RootGrow7.ogg');
-            game.load.image('pot_bg', 'Image/scene1/background1withplants.png');
+            game.load.audio('shatter', 'Audio/SoundEffects/LD42PotShattering.ogg');
+            game.load.image('pot_bg', 'Image/scene1/blurredbg.png');
             game.load.image('pot_shelf', 'Image/scene1/shelf.png');
             game.load.image('pot_shelf_hl', 'Image/scene1/shelfhighlighting.png');
             game.load.image('pot_cross', 'Image/scene1/pottransparent.png');
@@ -197,16 +198,19 @@ function default_1(game) {
             game.load.image('pot_frontshard4', 'Image/scene1/potbreaking shards/frontshard4start.png');
             game.load.image('pot_frontshard5', 'Image/scene1/potbreaking shards/frontshard5start.png');
             game.load.image('pot_frontshard6', 'Image/scene1/potbreaking shards/frontshard6start.png');
+            game.load.image('pot_mess', 'Image/scene1/potmess(frame1).png');
+            game.load.image('pot_fall', 'Image/scene1/plantfall(frame1).png');
             game.load.spritesheet('pot_pot', 'Image/scene1/potbreaking spritesheet.png', 160, 90);
             game.load.spritesheet('pot_rootleft', 'Image/scene1/rootleft spritesheet.png', 160, 90);
             game.load.spritesheet('pot_rootright', 'Image/scene1/rootright spritesheet.png', 160, 90);
+            game.load.audio('thud', 'Audio/SoundEffects/LD42Thud.ogg');
             game.load.image('room_bg', 'Image/scene2/background2.png');
-            game.load.image('room_vines', 'Image/scene2/vines1.png');
-            game.load.image('room_beans', 'Image/scene2/beans1.png');
             game.load.image('room_int', 'Image/scene2/wallinterior.png');
             game.load.image('room_pot', 'Image/scene2/brokenpotshards.png');
-            game.load.image('room_plant', 'Image/scene2/plantfallen.png');
             game.load.image('room_ext', 'Image/scene2/wallexterior.png');
+            game.load.spritesheet('room_vines', 'Image/scene2/vine spritesheet.png', 160, 90);
+            game.load.spritesheet('room_beans', 'Image/scene2/bean spritesheet.png', 160, 90);
+            game.load.spritesheet('room_plant', 'Image/scene2/plantfall spritesheet.png', 160, 90);
         },
         create: function () {
             game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
@@ -254,7 +258,7 @@ function default_1(game) {
             var rootLeft = game.add.sprite(0, 0, 'pot_rootleft');
             var rootRight = game.add.sprite(0, 0, 'pot_rootright');
             pot = game.add.sprite(0, 0, 'pot_pot');
-            game.add.image(0, 0, 'pot_pot_hl');
+            var pot_hl = game.add.image(0, 0, 'pot_pot_hl');
             var plant = game.add.image(0, 0, 'pot_plant');
             hover = new Phaser.Signal();
             hover.add(function () {
@@ -282,6 +286,7 @@ function default_1(game) {
                         if (leftGrowth === 4 && rightGrowth === 3) {
                             musics['1'].fadeTo(500, 0);
                             musics['2'].fadeTo(500, 1);
+                            pot_hl.destroy();
                             rootRight.frame = rightGrowth + 1;
                             pot.frame = 1;
                             showCross = false;
@@ -290,37 +295,58 @@ function default_1(game) {
                     }
                     else if (!shattered) {
                         shattered = true;
+                        game.sound.play('shatter');
                         potCross.destroy();
                         root.destroy();
                         rootLeft.destroy();
                         rootRight.destroy();
                         pot.destroy();
                         plant.destroy();
-                        var time_1 = 375;
+                        var shatterTime = 375;
                         var easing = Phaser.Easing.Sinusoidal.InOut;
-                        game.add.tween(game.add.image(0, 0, 'pot_backshard1')).to({ x: -16, y: -15 }, time_1, easing, true);
-                        game.add.tween(game.add.image(0, 0, 'pot_backshard2')).to({ x: 1, y: -20 }, time_1, easing, true);
-                        game.add.tween(game.add.image(0, 0, 'pot_backshard3')).to({ x: 15, y: -20 }, time_1, easing, true);
-                        game.add.tween(game.add.image(0, 0, 'pot_backshard4')).to({ x: -14, y: 3 }, time_1, easing, true);
-                        game.add.tween(game.add.image(0, 0, 'pot_backshard5')).to({ x: 3, y: -7 }, time_1, easing, true);
-                        game.add.tween(game.add.image(0, 0, 'pot_backshard6')).to({ x: 30, y: -1 }, time_1, easing, true);
-                        game.add.image(0, 0, 'pot_float');
-                        game.add.tween(game.add.image(0, 0, 'pot_frontshard1')).to({ x: -29, y: -5 }, time_1, easing, true);
-                        game.add.tween(game.add.image(0, 0, 'pot_frontshard2')).to({ x: -2, y: -3 }, time_1, easing, true);
-                        game.add.tween(game.add.image(0, 0, 'pot_frontshard3')).to({ x: 14, y: -8 }, time_1, easing, true);
-                        game.add.tween(game.add.image(0, 0, 'pot_frontshard4')).to({ x: 23, y: -14 }, time_1, easing, true);
-                        game.add.tween(game.add.image(0, 0, 'pot_frontshard5')).to({ x: -20, y: 3 }, time_1, easing, true);
-                        game.add.tween(game.add.image(0, 0, 'pot_frontshard6')).to({ x: 15, y: 2 }, time_1, easing, true);
+                        var backshards_1 = [];
+                        backshards_1.push(game.add.image(0, 0, 'pot_backshard1'));
+                        backshards_1.push(game.add.image(0, 0, 'pot_backshard2'));
+                        backshards_1.push(game.add.image(0, 0, 'pot_backshard3'));
+                        backshards_1.push(game.add.image(0, 0, 'pot_backshard4'));
+                        backshards_1.push(game.add.image(0, 0, 'pot_backshard5'));
+                        backshards_1.push(game.add.image(0, 0, 'pot_backshard6'));
+                        var float_1 = game.add.image(0, 0, 'pot_float');
+                        var frontshards_1 = [];
+                        frontshards_1.push(game.add.image(0, 0, 'pot_frontshard1'));
+                        frontshards_1.push(game.add.image(0, 0, 'pot_frontshard2'));
+                        frontshards_1.push(game.add.image(0, 0, 'pot_frontshard3'));
+                        frontshards_1.push(game.add.image(0, 0, 'pot_frontshard4'));
+                        frontshards_1.push(game.add.image(0, 0, 'pot_frontshard5'));
+                        frontshards_1.push(game.add.image(0, 0, 'pot_frontshard6'));
+                        game.add.tween(backshards_1[0]).to({ x: -16, y: -15 }, shatterTime, easing, true);
+                        game.add.tween(backshards_1[1]).to({ x: 1, y: -20 }, shatterTime, easing, true);
+                        game.add.tween(backshards_1[2]).to({ x: 15, y: -20 }, shatterTime, easing, true);
+                        game.add.tween(backshards_1[3]).to({ x: -14, y: 3 }, shatterTime, easing, true);
+                        game.add.tween(backshards_1[4]).to({ x: 3, y: -7 }, shatterTime, easing, true);
+                        game.add.tween(backshards_1[5]).to({ x: 30, y: -1 }, shatterTime, easing, true);
+                        game.add.tween(frontshards_1[0]).to({ x: -29, y: -5 }, shatterTime, easing, true);
+                        game.add.tween(frontshards_1[1]).to({ x: -2, y: -3 }, shatterTime, easing, true);
+                        game.add.tween(frontshards_1[2]).to({ x: 14, y: -8 }, shatterTime, easing, true);
+                        game.add.tween(frontshards_1[3]).to({ x: 23, y: -14 }, shatterTime, easing, true);
+                        game.add.tween(frontshards_1[4]).to({ x: -20, y: 3 }, shatterTime, easing, true);
+                        game.add.tween(frontshards_1[5]).to({ x: 15, y: 2 }, shatterTime, easing, true);
                         var timer = game.time.create();
-                        timer.add(time_1, function () {
+                        timer.add(shatterTime, function () {
+                            backshards_1.forEach(function (shard) { return shard.destroy(); });
+                            float_1.destroy();
+                            frontshards_1.forEach(function (shard) { return shard.destroy(); });
+                            var fall = game.add.image(0, 0, 'pot_fall');
+                            game.add.tween(fall).to({ y: 50 }, 1000, Phaser.Easing.Quadratic.In, true);
+                            game.add.image(0, 0, 'pot_mess');
                             var darken = game.add.graphics();
                             darken.beginFill(0x000000);
                             darken.drawRect(0, 0, 160, 90);
                             darken.endFill();
-                            game.add.tween(darken).from({ alpha: 0 }, time_1, Phaser.Easing.Default, true);
-                            game.camera.flash(0xffffff, time_1);
+                            game.add.tween(darken).from({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
+                            game.camera.flash(0xffffff, 500);
                             var innerTimer = game.time.create();
-                            innerTimer.add(375, function () { return game.state.start('room', true, false, musics); });
+                            innerTimer.add(1000, function () { return game.state.start('room', true, false, musics); });
                             innerTimer.start();
                         });
                         timer.start();
@@ -328,7 +354,7 @@ function default_1(game) {
                 }
             });
         },
-        render: function () {
+        update: function () {
             var closeToPot = new Phaser.Polygon([
                 [37, 44],
                 [50, 81],
@@ -364,7 +390,7 @@ function default_1(game) {
     var wall;
     var fade;
     var hover;
-    var hovering = false;
+    var hovering = true;
     return {
         init: function (theMusics) {
             musics = theMusics;
@@ -373,29 +399,37 @@ function default_1(game) {
             musics['2'].fadeTo(500, 0);
             musics['3'].fadeTo(500, 1);
             game.add.image(0, 0, 'room_bg');
-            game.add.image(0, 0, 'room_vines');
-            game.add.image(0, 0, 'room_beans');
+            game.add.sprite(0, 0, 'room_vines');
+            game.add.sprite(0, 0, 'room_beans');
             game.add.image(0, 0, 'room_int');
             game.add.image(0, 0, 'room_pot');
-            game.add.image(0, 0, 'room_plant');
+            var plant = game.add.sprite(0, 0, 'room_plant');
             wall = game.add.image(0, 0, 'room_ext');
+            wall.alpha = 0;
             var darken = game.add.graphics();
             darken.beginFill(0x000000);
             darken.drawRect(0, 0, 160, 90);
             darken.endFill();
-            game.add.tween(darken).to({ alpha: 0 }, 500, Phaser.Easing.Default, true);
+            game.add.tween(darken).to({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
+            plant.animations.add('fall');
+            plant.animations.play('fall', 2);
             hover = new Phaser.Signal();
-            hover.add(function () {
-                var newAlpha = hovering ? 0 : 1;
-                var time = Math.abs(newAlpha - wall.alpha) * 250;
-                if (fade) {
-                    fade.stop();
-                }
-                fade = game.add.tween(wall);
-                fade.to({ alpha: newAlpha }, time, Phaser.Easing.Default, true);
+            var timer = game.time.create();
+            timer.add(1000, function () {
+                game.sound.play('thud');
+                hover.add(function () {
+                    var newAlpha = hovering ? 0 : 1;
+                    var time = Math.abs(newAlpha - wall.alpha) * 250;
+                    if (fade) {
+                        fade.stop();
+                    }
+                    fade = game.add.tween(wall);
+                    fade.to({ alpha: newAlpha }, time, Phaser.Easing.Default, true);
+                });
             });
+            timer.start();
         },
-        render: function () {
+        update: function () {
             var closeToWall = new Phaser.Polygon([
                 [25, 15], [135, 15], [135, 85], [25, 85]
             ].map(function (_a) {
