@@ -1,23 +1,30 @@
 export default function(game: Phaser.Game) {
+  function loadAudio(key: string, filename: string) {
+    game.load.audio(key, [
+      'Audio/OggFiles/' + filename + '.ogg',
+      'Audio/WavFiles/' + filename + '.wav'
+    ]);
+  }
+
   return {
     preload() {
-      game.load.audio('music1', 'Audio/Music/Fun1.ogg');
-      game.load.audio('music2', 'Audio/Music/Fun2.ogg');
-      game.load.audio('music3', 'Audio/Music/Fun3.ogg');
+      loadAudio('music1', 'Music/Fun1');
+      loadAudio('music2', 'Music/Fun2');
+      loadAudio('music3', 'Music/Fun3');
 
       game.load.image('toolbar', 'Image/scene2/toolbar.png');
       game.load.image('toolbar_orig', 'Image/scene2/planticon (1,2).png');
       game.load.image('toolbar_bean', 'Image/scene2/beanicon (12,1).png');
       game.load.image('toolbar_vine', 'Image/scene2/vineicon (22,3).png');
 
-      game.load.audio('root1', 'Audio/SoundEffects/RootGrow1.ogg');
-      game.load.audio('root2', 'Audio/SoundEffects/RootGrow2.ogg');
-      game.load.audio('root3', 'Audio/SoundEffects/RootGrow3.ogg');
-      game.load.audio('root4', 'Audio/SoundEffects/RootGrow4.ogg');
-      game.load.audio('root5', 'Audio/SoundEffects/RootGrow5.ogg');
-      game.load.audio('root6', 'Audio/SoundEffects/RootGrow6.ogg');
-      game.load.audio('root7', 'Audio/SoundEffects/RootGrow7.ogg');
-      game.load.audio('shatter', 'Audio/SoundEffects/PotShattering.ogg');
+      loadAudio('root1', 'SoundEffects/RootGrow1');
+      loadAudio('root2', 'SoundEffects/RootGrow2');
+      loadAudio('root3', 'SoundEffects/RootGrow3');
+      loadAudio('root4', 'SoundEffects/RootGrow4');
+      loadAudio('root5', 'SoundEffects/RootGrow5');
+      loadAudio('root6', 'SoundEffects/RootGrow6');
+      loadAudio('root7', 'SoundEffects/RootGrow7');
+      loadAudio('shatter', 'SoundEffects/PotShattering');
 
       game.load.image('pot_bg', 'Image/scene1/blurredbg.png');
       game.load.image('pot_shelf', 'Image/scene1/shelf.png');
@@ -48,7 +55,7 @@ export default function(game: Phaser.Game) {
       game.load.spritesheet('pot_rootleft', 'Image/scene1/rootleft spritesheet.png', 160, 90);
       game.load.spritesheet('pot_rootright', 'Image/scene1/rootright spritesheet.png', 160, 90);
 
-      game.load.audio('thud', 'Audio/SoundEffects/Thud.ogg');
+      loadAudio('thud', 'SoundEffects/Thud');
 
       game.load.image('room_bg', 'Image/scene2/background2.png');
       game.load.image('room_int', 'Image/scene2/wallinterior.png');
@@ -70,10 +77,10 @@ export default function(game: Phaser.Game) {
 
       game.camera.bounds = game.world.bounds;
 
-      const musics: { [music: string]: Phaser.Sound } = {};
-      musics['1'] = game.sound.play('music1', 1, true);
-      musics['2'] = game.sound.play('music2', 0, true);
-      musics['3'] = game.sound.play('music3', 0, true);
+      const musics: Phaser.Sound[] = [];
+      musics.push(game.sound.play('music1', 1, true));
+      musics.push(game.sound.play('music2', 0, true));
+      musics.push(game.sound.play('music3', 0, true));
 
       game.state.start('pot', true, false, musics);
     }

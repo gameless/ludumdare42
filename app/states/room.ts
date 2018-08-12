@@ -1,5 +1,5 @@
 export default function(game: Phaser.Game) {
-  let musics: { [music: string]: Phaser.Sound };
+  let musics: Phaser.Sound[];
   let wall: Phaser.Image;
   let fade: Phaser.Tween;
   let hover: Phaser.Signal;
@@ -8,13 +8,14 @@ export default function(game: Phaser.Game) {
   let ateBean = false;
 
   return {
-    init(theMusics: { [music: string]: Phaser.Sound }) {
+    init(theMusics: Phaser.Sound[]) {
       musics = theMusics;
     },
 
     create() {
-      musics['2'].fadeTo(500, 0);
-      musics['3'].fadeTo(500, 1);
+      musics[0].fadeTo(500, 0);
+      musics[1].fadeTo(500, 0);
+      musics[2].fadeTo(500, 1);
 
       game.add.image(0, 0, 'room_bg');
       game.add.sprite(0, 0, 'room_vines');

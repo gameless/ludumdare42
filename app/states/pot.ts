@@ -1,5 +1,5 @@
 export default function(game: Phaser.Game) {
-  let musics: { [music: string]: Phaser.Sound };
+  let musics: Phaser.Sound[];
   let pot: Phaser.Sprite;
   let fade: Phaser.Tween;
   let hover: Phaser.Signal;
@@ -12,7 +12,7 @@ export default function(game: Phaser.Game) {
   let rightGrowth = 0;
 
   return {
-    init(theMusics: { [music: string]: Phaser.Sound }) {
+    init(theMusics: Phaser.Sound[]) {
       musics = theMusics;
     },
 
@@ -57,8 +57,8 @@ export default function(game: Phaser.Game) {
             }
 
             if (leftGrowth === 4 && rightGrowth === 3) {
-              musics['1'].fadeTo(500, 0);
-              musics['2'].fadeTo(500, 1);
+              musics[0].fadeTo(500, 0);
+              musics[1].fadeTo(500, 1);
 
               pot_hl.destroy();
               rootRight.frame = rightGrowth + 1;
