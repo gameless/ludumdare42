@@ -1,18 +1,18 @@
 Ludum Dare 42
 =============
 
-Setup
------
+Install
+-------
 
 Install the necessary `node_modules`:
 ```sh
 npm install
 ```
 
-Usage
------
+Develop
+-------
 
-Then start the watcher with continuous rebuild:
+Start the watcher with continuous rebuild:
 ```sh
 npm run start
 ```
@@ -22,3 +22,12 @@ You can also typecheck the code:
 ```sh
 npm run test
 ```
+
+Build
+-----
+
+First clone the `gh-pages` branch to `../ludumdare42-gh-pages`:
+```sh
+git clone -b gh-pages --single-branch https://github.com/gameless/ludumdare42.git ../ludumdare42-gh-pages
+```
+Then anytime you want to build, run `build.sh` from the root of this repository.
