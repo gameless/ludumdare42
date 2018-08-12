@@ -26,7 +26,7 @@ export default function(game: Phaser.Game) {
       darken.beginFill(0x000000);
       darken.drawRect(0, 0, 160, 90);
       darken.endFill();
-      game.add.tween(darken).to({ alpha: 0 }, 500, Phaser.Easing.Default, true);
+      game.add.tween(darken).to({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
 
       hover = new Phaser.Signal();
       hover.add(function() {

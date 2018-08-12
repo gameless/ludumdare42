@@ -27,7 +27,7 @@ export default function(game: Phaser.Game) {
       const rootRight = game.add.sprite(0, 0, 'pot_rootright');
 
       pot = game.add.sprite(0, 0, 'pot_pot');
-      game.add.image(0, 0, 'pot_pot_hl');
+      const pot_hl = game.add.image(0, 0, 'pot_pot_hl');
       const plant = game.add.image(0, 0, 'pot_plant');
 
       hover = new Phaser.Signal();
@@ -60,6 +60,7 @@ export default function(game: Phaser.Game) {
               musics['1'].fadeTo(500, 0);
               musics['2'].fadeTo(500, 1);
 
+              pot_hl.destroy();
               rootRight.frame = rightGrowth + 1;
               pot.frame = 1;
               showCross = false;
@@ -77,34 +78,60 @@ export default function(game: Phaser.Game) {
             pot.destroy();
             plant.destroy();
 
-            const time = 375;
+            const shatterTime = 375;
             const easing = Phaser.Easing.Sinusoidal.InOut;
-            game.add.tween(game.add.image(0, 0, 'pot_backshard1')).to({ x: -16, y: -15 }, time, easing, true);
-            game.add.tween(game.add.image(0, 0, 'pot_backshard2')).to({ x: 1, y: -20 }, time, easing, true);
-            game.add.tween(game.add.image(0, 0, 'pot_backshard3')).to({ x: 15, y: -20 }, time, easing, true);
-            game.add.tween(game.add.image(0, 0, 'pot_backshard4')).to({ x: -14, y: 3 }, time, easing, true);
-            game.add.tween(game.add.image(0, 0, 'pot_backshard5')).to({ x: 3, y: -7 }, time, easing, true);
-            game.add.tween(game.add.image(0, 0, 'pot_backshard6')).to({ x: 30, y: -1 }, time, easing, true);
-            game.add.image(0, 0, 'pot_float');
-            game.add.tween(game.add.image(0, 0, 'pot_frontshard1')).to({ x: -29, y: -5 }, time, easing, true);
-            game.add.tween(game.add.image(0, 0, 'pot_frontshard2')).to({ x: -2, y: -3 }, time, easing, true);
-            game.add.tween(game.add.image(0, 0, 'pot_frontshard3')).to({ x: 14, y: -8 }, time, easing, true);
-            game.add.tween(game.add.image(0, 0, 'pot_frontshard4')).to({ x: 23, y: -14 }, time, easing, true);
-            game.add.tween(game.add.image(0, 0, 'pot_frontshard5')).to({ x: -20, y: 3 }, time, easing, true);
-            game.add.tween(game.add.image(0, 0, 'pot_frontshard6')).to({ x: 15, y: 2 }, time, easing, true);
+
+            const backshards: Phaser.Image[] = [];
+            backshards.push(game.add.image(0, 0, 'pot_backshard1'));
+            backshards.push(game.add.image(0, 0, 'pot_backshard2'));
+            backshards.push(game.add.image(0, 0, 'pot_backshard3'));
+            backshards.push(game.add.image(0, 0, 'pot_backshard4'));
+            backshards.push(game.add.image(0, 0, 'pot_backshard5'));
+            backshards.push(game.add.image(0, 0, 'pot_backshard6'));
+
+            const float = game.add.image(0, 0, 'pot_float');
+
+            const frontshards: Phaser.Image[] = [];
+            frontshards.push(game.add.image(0, 0, 'pot_frontshard1'));
+            frontshards.push(game.add.image(0, 0, 'pot_frontshard2'));
+            frontshards.push(game.add.image(0, 0, 'pot_frontshard3'));
+            frontshards.push(game.add.image(0, 0, 'pot_frontshard4'));
+            frontshards.push(game.add.image(0, 0, 'pot_frontshard5'));
+            frontshards.push(game.add.image(0, 0, 'pot_frontshard6'));
+
+            game.add.tween(backshards[0]).to({ x: -16, y: -15 }, shatterTime, easing, true);
+            game.add.tween(backshards[1]).to({ x: 1, y: -20 }, shatterTime, easing, true);
+            game.add.tween(backshards[2]).to({ x: 15, y: -20 }, shatterTime, easing, true);
+            game.add.tween(backshards[3]).to({ x: -14, y: 3 }, shatterTime, easing, true);
+            game.add.tween(backshards[4]).to({ x: 3, y: -7 }, shatterTime, easing, true);
+            game.add.tween(backshards[5]).to({ x: 30, y: -1 }, shatterTime, easing, true);
+            game.add.tween(frontshards[0]).to({ x: -29, y: -5 }, shatterTime, easing, true);
+            game.add.tween(frontshards[1]).to({ x: -2, y: -3 }, shatterTime, easing, true);
+            game.add.tween(frontshards[2]).to({ x: 14, y: -8 }, shatterTime, easing, true);
+            game.add.tween(frontshards[3]).to({ x: 23, y: -14 }, shatterTime, easing, true);
+            game.add.tween(frontshards[4]).to({ x: -20, y: 3 }, shatterTime, easing, true);
+            game.add.tween(frontshards[5]).to({ x: 15, y: 2 }, shatterTime, easing, true);
 
             const timer = game.time.create();
-            timer.add(time, () => {
+            timer.add(shatterTime, () => {
+              backshards.forEach(shard => shard.destroy());
+              float.destroy();
+              frontshards.forEach(shard => shard.destroy());
+
+              const fall = game.add.image(0, 0, 'pot_fall');
+              game.add.tween(fall).to({ y: 50 }, 1000, Phaser.Easing.Quadratic.In, true);
+              game.add.image(0, 0, 'pot_mess');
+
               const darken = game.add.graphics();
               darken.beginFill(0x000000);
               darken.drawRect(0, 0, 160, 90);
               darken.endFill();
-              game.add.tween(darken).from({ alpha: 0 }, time, Phaser.Easing.Default, true);
+              game.add.tween(darken).from({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
 
-              game.camera.flash(0xffffff, time);
+              game.camera.flash(0xffffff, 500);
 
               const innerTimer = game.time.create();
-              innerTimer.add(375, () => game.state.start('room', true, false, musics));
+              innerTimer.add(1000, () => game.state.start('room', true, false, musics));
               innerTimer.start();
             });
             timer.start();

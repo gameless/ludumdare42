@@ -36,6 +36,9 @@ export default function(game: Phaser.Game) {
       game.load.image('pot_frontshard5', 'Image/scene1/potbreaking shards/frontshard5start.png');
       game.load.image('pot_frontshard6', 'Image/scene1/potbreaking shards/frontshard6start.png');
 
+      game.load.image('pot_mess', 'Image/scene1/potmess(frame1).png');
+      game.load.image('pot_fall', 'Image/scene1/plantfall(frame1).png');
+
       game.load.spritesheet('pot_pot', 'Image/scene1/potbreaking spritesheet.png', 160, 90);
       game.load.spritesheet('pot_rootleft', 'Image/scene1/rootleft spritesheet.png', 160, 90);
       game.load.spritesheet('pot_rootright', 'Image/scene1/rootright spritesheet.png', 160, 90);
