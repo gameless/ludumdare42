@@ -6,9 +6,9 @@ export default function(game: Phaser.Game) {
       game.load.audio('music3', 'Audio/Music/Fun3.ogg');
 
       game.load.image('toolbar', 'Image/scene2/toolbar.png');
-      game.load.image('toolbar_orig', 'Image/scene2/origplanticon.png');
-      game.load.image('toolbar_bean', 'Image/scene2/beanicon.png');
-      game.load.image('toolbar_vine', 'Image/scene2/vineicon.png');
+      game.load.image('toolbar_orig', 'Image/scene2/planticon (1,2).png');
+      game.load.image('toolbar_bean', 'Image/scene2/beanicon (12,1).png');
+      game.load.image('toolbar_vine', 'Image/scene2/vineicon (22,3).png');
 
       game.load.audio('root1', 'Audio/SoundEffects/RootGrow1.ogg');
       game.load.audio('root2', 'Audio/SoundEffects/RootGrow2.ogg');
@@ -56,7 +56,9 @@ export default function(game: Phaser.Game) {
       game.load.image('room_ext', 'Image/scene2/wallexterior.png');
 
       game.load.spritesheet('room_vines', 'Image/scene2/vine spritesheet.png', 160, 90);
-      game.load.spritesheet('room_beans', 'Image/scene2/bean spritesheet.png', 160, 90);
+      game.load.spritesheet('room_beanleft', 'Image/scene2/beanleft spritesheet.png', 160, 90);
+      game.load.spritesheet('room_beanright', 'Image/scene2/beanright spritesheet.png', 160, 90);
+      game.load.spritesheet('room_otherbeans', 'Image/scene2/otherbeans spritesheet.png', 160, 90);
       game.load.spritesheet('room_plant', 'Image/scene2/plantfall spritesheet.png', 160, 90);
     },
 
