@@ -231,6 +231,7 @@ function default_1(game) {
             loadAudio('grow4', 'SoundEffects/Grow4');
             loadAudio('grow5', 'SoundEffects/Grow5');
             loadAudio('grow6', 'SoundEffects/Grow6');
+            loadAudio('snap', 'SoundEffects/VineSnap');
             game.load.image('room_bg', 'Image/scene2/background2.png');
             game.load.image('room_int', 'Image/scene2/wallinterior.png');
             game.load.image('room_pot', 'Image/scene2/brokenpotshards.png');
@@ -254,7 +255,7 @@ function default_1(game) {
             musics.push(game.sound.play('music3', 0, true));
             musics.push(game.sound.play('music4', 0, true));
             musics.push(game.sound.play('music5', 0, true));
-            game.state.start('menu', true, false, musics);
+            game.state.start('room', true, false, musics);
         }
     };
 }
@@ -268,7 +269,14 @@ exports.default = default_1;
 require.register("states/menu.ts", function(exports, require, module) {
 "use strict";
 function default_1(game) {
+    var button = new Phaser.Polygon([
+        [16, 25], [13, 57], [145, 64], [145, 30]
+    ].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return new Phaser.Point(x, y);
+    }));
     var musics;
+    var hl;
     return {
         init: function (theMusics) {
             musics = theMusics;
@@ -276,7 +284,25 @@ function default_1(game) {
         create: function () {
             game.add.image(0, 0, 'menu_background');
             game.add.image(0, 0, 'menu_start');
-            game.input.onDown.add(function () { return game.state.start('pot', true, false, musics); });
+            hl = game.make.bitmapData(160, 90);
+            game.add.image(0, 0, hl);
+            game.input.onUp.add(function () {
+                if (button.contains(game.input.x, game.input.y)) {
+                    hl.destroy();
+                    game.state.start('pot', true, false, musics);
+                }
+            });
+        },
+        render: function () {
+            hl.clear();
+            if (button.contains(game.input.x, game.input.y)) {
+                hl.blendSourceOver();
+                var alpha = game.input.activePointer.isDown ? 0.75 : 0.5;
+                hl.fill(0xff, 0xff, 0xff, alpha);
+                hl.blendDestinationIn();
+                hl.circle(game.input.x, game.input.y, 10);
+                hl.draw('menu_start');
+            }
         }
     };
 }
@@ -322,9 +348,13 @@ require.register("states/pot.ts", function(exports, require, module) {
 "use strict";
 function default_1(game) {
     var musics;
+    var rootLeft;
+    var rootRight;
     var pot;
     var fade;
     var hover;
+    var hl;
+    var hl_image;
     var hovering = false;
     var showCross = true;
     var shattered = false;
@@ -342,8 +372,10 @@ function default_1(game) {
             game.add.image(0, 0, 'pot_shelf_hl');
             var potCross = game.add.image(0, 0, 'pot_cross');
             var root = game.add.image(0, 0, 'pot_root');
-            var rootLeft = game.add.sprite(0, 0, 'pot_rootleft');
-            var rootRight = game.add.sprite(0, 0, 'pot_rootright');
+            rootLeft = game.add.sprite(0, 0, 'pot_rootleft');
+            rootRight = game.add.sprite(0, 0, 'pot_rootright');
+            hl = game.make.bitmapData(160, 90);
+            hl_image = game.add.image(0, 0, hl);
             pot = game.add.sprite(0, 0, 'pot_pot');
             var pot_hl = game.add.image(0, 0, 'pot_pot_hl');
             var plant = game.add.image(0, 0, 'pot_plant');
@@ -374,6 +406,8 @@ function default_1(game) {
                             musics[1].fadeTo(500, 0);
                             musics[2].fadeTo(500, 1);
                             pot_hl.destroy();
+                            hl_image.destroy();
+                            game.add.image(0, 0, hl);
                             rootRight.frame = rightGrowth + 1;
                             pot.frame = 1;
                             showCross = false;
@@ -389,6 +423,7 @@ function default_1(game) {
                         rootRight.destroy();
                         pot.destroy();
                         plant.destroy();
+                        hl_image.destroy();
                         var shatterTime = 375;
                         var easing = Phaser.Easing.Sinusoidal.InOut;
                         var backshards_1 = [];
@@ -433,7 +468,10 @@ function default_1(game) {
                             game.add.tween(darken).from({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
                             game.camera.flash(0xffffff, 500);
                             var innerTimer = game.time.create();
-                            innerTimer.add(1000, function () { return game.state.start('room', true, false, musics); });
+                            innerTimer.add(1000, function () {
+                                hl.destroy();
+                                game.state.start('room', true, false, musics);
+                            });
                             innerTimer.start();
                         });
                         timer.start();
@@ -459,6 +497,28 @@ function default_1(game) {
             if (hoveringNow !== hovering) {
                 hovering = hoveringNow;
                 hover.dispatch();
+            }
+        },
+        render: function () {
+            hl.clear();
+            hl.blendSourceOver();
+            var alpha = game.input.activePointer.isDown ? 0.75 : 0.5;
+            hl.fill(0xff, 0xff, 0xff, alpha);
+            hl.blendDestinationIn();
+            hl.circle(game.input.x, game.input.y, 10);
+            if (showCross) {
+                if (game.input.x < 80 && leftGrowth < 4) {
+                    hl.draw(rootLeft);
+                }
+                else if (game.input.x >= 80 && rightGrowth < 3) {
+                    hl.draw(rootRight);
+                }
+                else {
+                    hl.clear();
+                }
+            }
+            else {
+                hl.draw(pot);
             }
         }
     };
@@ -570,6 +630,7 @@ function default_1(game) {
                             setupTool(toolOrig, function (x, y) {
                                 var vine = new Phaser.Rectangle(82, 40, 12, 12);
                                 if (beanRight.frame < 1 && vine.contains(x, y)) {
+                                    game.sound.play('snap');
                                     musics[3].fadeTo(500, 0);
                                     musics[4].fadeTo(500, 1);
                                     vines.frame = 1;
