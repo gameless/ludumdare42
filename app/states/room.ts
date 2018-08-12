@@ -5,6 +5,8 @@ export default function(game: Phaser.Game) {
   let hover: Phaser.Signal;
   let hovering = true;
 
+  let ateBean = false;
+
   return {
     init(theMusics: { [music: string]: Phaser.Sound }) {
       musics = theMusics;
@@ -16,7 +18,7 @@ export default function(game: Phaser.Game) {
 
       game.add.image(0, 0, 'room_bg');
       game.add.sprite(0, 0, 'room_vines');
-      game.add.sprite(0, 0, 'room_beans');
+      const beans = game.add.sprite(0, 0, 'room_beans');
       game.add.image(0, 0, 'room_int');
       game.add.image(0, 0, 'room_pot');
       const plant = game.add.sprite(0, 0, 'room_plant');
@@ -44,6 +46,25 @@ export default function(game: Phaser.Game) {
           }
           fade = game.add.tween(wall);
           fade.to({ alpha: newAlpha }, time, Phaser.Easing.Default, true);
+        });
+
+        game.input.onDown.add(() => {
+          if (!ateBean) {
+            const leftBean = new Phaser.Rectangle(53, 53, 8, 15);
+            const rightBean = new Phaser.Rectangle(73, 53, 8, 15);
+            if (leftBean.contains(game.input.x, game.input.y)) {
+              ateBean = true;
+              beans.frame = 1;
+            } else if (rightBean.contains(game.input.x, game.input.y)) {
+              ateBean = true;
+              beans.frame = 2;
+            }
+            if (ateBean) {
+              const beanTimer = game.time.create();
+              beanTimer.add(500, () => beans.frame = 3)
+              beanTimer.start();
+            }
+          }
         });
       });
       timer.start();
