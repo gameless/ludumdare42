@@ -57,8 +57,8 @@ export default function(game: Phaser.Game) {
             }
 
             if (leftGrowth === 4 && rightGrowth === 3) {
-              musics['1'].fadeTo(375, 0);
-              musics['2'].fadeTo(375, 1);
+              musics['1'].fadeTo(500, 0);
+              musics['2'].fadeTo(500, 1);
 
               rootRight.frame = rightGrowth + 1;
               pot.frame = 1;
@@ -67,6 +67,8 @@ export default function(game: Phaser.Game) {
             }
           } else if (!shattered) {
             shattered = true;
+
+            game.sound.play('shatter');
 
             potCross.destroy();
             root.destroy();
@@ -90,6 +92,22 @@ export default function(game: Phaser.Game) {
             game.add.tween(game.add.image(0, 0, 'pot_frontshard4')).to({ x: 23, y: -14 }, time, easing, true);
             game.add.tween(game.add.image(0, 0, 'pot_frontshard5')).to({ x: -20, y: 3 }, time, easing, true);
             game.add.tween(game.add.image(0, 0, 'pot_frontshard6')).to({ x: 15, y: 2 }, time, easing, true);
+
+            const timer = game.time.create();
+            timer.add(time, () => {
+              const darken = game.add.graphics();
+              darken.beginFill(0x000000);
+              darken.drawRect(0, 0, 160, 90);
+              darken.endFill();
+              game.add.tween(darken).from({ alpha: 0 }, time, Phaser.Easing.Default, true);
+
+              game.camera.flash(0xffffff, time);
+
+              const innerTimer = game.time.create();
+              innerTimer.add(375, () => game.state.start('room', true, false, musics));
+              innerTimer.start();
+            });
+            timer.start();
           }
         }
       });

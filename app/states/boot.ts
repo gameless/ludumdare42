@@ -12,8 +12,9 @@ export default function(game: Phaser.Game) {
       game.load.audio('root5', 'Audio/SoundEffects/LD42RootGrow5.ogg');
       game.load.audio('root6', 'Audio/SoundEffects/LD42RootGrow6.ogg');
       game.load.audio('root7', 'Audio/SoundEffects/LD42RootGrow7.ogg');
+      game.load.audio('shatter', 'Audio/SoundEffects/LD42PotShattering.ogg');
 
-      game.load.image('pot_bg', 'Image/scene1/background1withplants.png');
+      game.load.image('pot_bg', 'Image/scene1/blurredbg.png');
       game.load.image('pot_shelf', 'Image/scene1/shelf.png');
       game.load.image('pot_shelf_hl', 'Image/scene1/shelfhighlighting.png');
       game.load.image('pot_cross', 'Image/scene1/pottransparent.png');
