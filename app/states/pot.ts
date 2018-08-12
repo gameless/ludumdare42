@@ -68,6 +68,8 @@ export default function(game: Phaser.Game) {
           } else if (!shattered) {
             shattered = true;
 
+            game.sound.play('shatter');
+
             potCross.destroy();
             root.destroy();
             rootLeft.destroy();
