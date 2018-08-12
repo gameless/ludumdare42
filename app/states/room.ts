@@ -18,7 +18,7 @@ export default function(game: Phaser.Game) {
       musics[2].fadeTo(500, 1);
 
       game.add.image(0, 0, 'room_bg');
-      game.add.sprite(0, 0, 'room_vines');
+      const vines = game.add.sprite(0, 0, 'room_vines');
       const beanLeft = game.add.sprite(0, 0, 'room_beanleft');
       const beanRight = game.add.sprite(0, 0, 'room_beanright');
       const otherBeans = game.add.sprite(0, 0, 'room_otherbeans');
@@ -37,13 +37,14 @@ export default function(game: Phaser.Game) {
       toolBean.alpha = 0;
       toolVine.alpha = 0;
 
-      function setupTool(tool: Phaser.Image) {
+      function setupTool(tool: Phaser.Image, action: (x: number, y: number) => void) {
         const initialX = tool.x;
         const initialY = tool.y;
 
         tool.inputEnabled = true;
         tool.input.enableDrag();
         tool.events.onDragStop.add(() => {
+          action(game.input.x, game.input.y);
           tool.x = initialX;
           tool.y = initialY;
         });
@@ -101,8 +102,19 @@ export default function(game: Phaser.Game) {
               baseTween.chain(origTween, beanTween);
               baseTween.start();
 
-              setupTool(toolOrig);
-              setupTool(toolBean);
+              setupTool(toolOrig, (x, y) => {
+                const vine = new Phaser.Rectangle(82, 40, 12, 12);
+                if (beanRight.frame < 1 && vine.contains(x, y)) {
+                  vines.frame = 1;
+                }
+              });
+              setupTool(toolBean, (x, y) => {
+                if (leftBean.contains(x, y)) {
+                  beanLeft.frame = 0;
+                } else if (rightBean.contains(x, y)) {
+                  beanRight.frame = 0;
+                }
+              });
             }
           }
         });
