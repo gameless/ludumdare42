@@ -220,6 +220,7 @@ var load_1 = require("./states/load");
 var menu_1 = require("./states/menu");
 var pot_1 = require("./states/pot");
 var room_1 = require("./states/room");
+var island_1 = require("./states/island");
 var planet_1 = require("./states/planet");
 var credits_1 = require("./states/credits");
 var game = new Phaser.Game({ width: 160, height: 90, parent: 'parent', antialias: false });
@@ -227,6 +228,7 @@ game.state.add('load', load_1.default);
 game.state.add('menu', menu_1.default);
 game.state.add('pot', pot_1.default);
 game.state.add('room', room_1.default);
+game.state.add('island', island_1.default);
 game.state.add('planet', planet_1.default);
 game.state.add('credits', credits_1.default);
 game.state.start('load');
@@ -392,6 +394,59 @@ exports.default = default_1;
 
 });
 
+require.register("states/island.ts", function(exports, require, module) {
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var delay_1 = require("../delay");
+var fade_1 = require("../fade");
+var pause_1 = require("../pause");
+var music_1 = require("../music");
+var default_1 = (function (_super) {
+    __extends(default_1, _super);
+    function default_1() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.startFade = true;
+        return _this;
+    }
+    default_1.prototype.init = function (music, startFade) {
+        _super.prototype.init.call(this, music);
+        this.startFade = startFade;
+    };
+    default_1.prototype.create = function () {
+        var _this = this;
+        this.game.input.keyboard.removeCallbacks();
+        this.music.fadeTrack(500, 'mid1');
+        this.music.fadeBadness(500, 0);
+        this.game.add.image(0, 0, 'island_bg');
+        this.game.input.keyboard.addCallbacks(this, function (event) {
+            if (event.keyCode === pause_1.escapeCode) {
+                music_1.startState(_this.game, 'menu', _this.music, 'island');
+            }
+        });
+        if (this.startFade) {
+            fade_1.fadeIn(this.game, 1000);
+        }
+        delay_1.delay(this.game, 1000, function () {
+            _this.game.input.onUp.add(function () {
+                fade_1.fadeOut(_this.game, 1000);
+                delay_1.delay(_this.game, 1000, function () {
+                    music_1.startState(_this.game, 'planet', _this.music);
+                });
+            });
+        });
+    };
+    return default_1;
+}(music_1.MusicalState));
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
+
+
+});
+
 require.register("states/load.ts", function(exports, require, module) {
 "use strict";
 var _ = require("lodash");
@@ -426,6 +481,8 @@ var sounds = [
     ['music_fun3_bitcrushed', 'Music/Fun3Bitcrushed'],
     ['music_fun4', 'Music/Fun4'],
     ['music_fun4_bitcrushed', 'Music/Fun4Bitcrushed'],
+    ['music_mid1', 'Music/Mid1'],
+    ['music_mid1_bitcrushed', 'Music/Mid1Bitcrushed'],
     ['music_end', 'Music/End'],
     ['effect_root1', 'SoundEffects/RootGrow1'],
     ['effect_root2', 'SoundEffects/RootGrow2'],
@@ -457,7 +514,7 @@ function soundsReady(game) {
         return game.cache.isSoundDecoded(key);
     });
 }
-var tracks = ['title', 'fun1', 'fun2', 'fun3', 'fun4', 'end'];
+var tracks = ['title', 'fun1', 'fun2', 'fun3', 'fun4', 'mid1', 'end'];
 function sceneImageLoader(prefix, path) {
     return function (game, key, filename) {
         game.load.image(prefix + '_' + key, 'Image/' + path + '/' + filename + '.png');
@@ -510,6 +567,14 @@ function loadRoomImages(game) {
     loadRoomSheet(game, 'plant', 'plant spritesheet');
     loadRoomImage(game, 'pot', 'brokenpotshards');
 }
+var loadIslandImage = sceneImageLoader('island', 'scene3');
+var loadIslandSheet = sceneImageLoader('island', 'scene3');
+function loadIslandImages(game) {
+    loadIslandImage(game, 'bg', 'bg3');
+    loadIslandSheet(game, 'plant', 'plant spritesheet');
+    loadIslandSheet(game, 'seaweed', 'seaweed spritesheet');
+    loadIslandImage(game, 'trees', 'trees');
+}
 var loadPlanetSheet = sceneSheetLoader('planet', 'scenefinal');
 function loadPlanetImages(game) {
     loadPlanetSheet(game, 'animation', 'scenefinal spritesheet');
@@ -526,6 +591,7 @@ function default_1(game) {
             loadMenuImages(game);
             loadPotImages(game);
             loadRoomImages(game);
+            loadIslandImages(game);
             loadPlanetImages(game);
             loadCreditsImages(game);
         },
@@ -565,7 +631,7 @@ var default_1 = (function (_super) {
     }
     default_1.prototype.init = function (music, behind) {
         _super.prototype.init.call(this, music);
-        this.behind = behind || 'pot';
+        this.behind = behind || 'island';
     };
     default_1.prototype.create = function () {
         var _this = this;
@@ -957,7 +1023,7 @@ var default_1 = (function (_super) {
                         fade_1.fadeOut(_this.game, 1000);
                         delay_1.delay(_this.game, 1000, function () {
                             _this.highlight.destroy();
-                            music_1.startState(_this.game, 'planet', _this.music);
+                            music_1.startState(_this.game, 'island', _this.music, true);
                         });
                     }
                 });
