@@ -144,7 +144,7 @@ function loadRoomImages(game: Phaser.Game) {
 }
 
 const loadIslandImage = sceneImageLoader('island', 'scene3');
-const loadIslandSheet = sceneImageLoader('island', 'scene3');
+const loadIslandSheet = sceneSheetLoader('island', 'scene3');
 
 function loadIslandImages(game: Phaser.Game) {
   loadIslandImage(game, 'bg', 'bg3');
