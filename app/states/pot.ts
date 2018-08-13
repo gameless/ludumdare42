@@ -53,7 +53,7 @@ export default function(game: Phaser.Game) {
       pot = game.add.sprite(0, 0, 'pot_pot');
       const pot_hl = game.add.image(0, 0, 'pot_pot_hl');
 
-      highlight = new Highlight(game, (x, y) => {
+      highlight = new Highlight(game, (x, _) => {
         if (showCross) {
           if (hovering) {
             if (x < 80 && leftGrowth < 4) {
