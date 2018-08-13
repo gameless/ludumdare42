@@ -46,8 +46,10 @@ export default function(game: Phaser.Game) {
         musics[1].fadeTo(8000, 0);
         musics[6].fadeTo(8000, 1);
 
-        plant.animations.add('wilt');
-        plant.animations.play('wilt', 0.25);
+        if (!shattered) {
+          plant.animations.add('wilt');
+          plant.animations.play('wilt', 0.25);
+        }
       });
       wiltTimer.start();
 
@@ -101,8 +103,9 @@ export default function(game: Phaser.Game) {
             root.destroy();
             rootLeft.destroy();
             rootRight.destroy();
-            pot.destroy();
             plant.destroy();
+            blood.destroy();
+            pot.destroy();
             hl_image.destroy();
 
             const shatterTime = 375;
