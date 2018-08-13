@@ -46,13 +46,41 @@ export default function(game: Phaser.Game) {
       toolBean.alpha = 0;
       toolVine.alpha = 0;
 
-      function setupTool(tool: Phaser.Image, action: (x: number, y: number) => void) {
+      function setupTool(tool: Phaser.Image, dots: number[][], action: (x: number, y: number) => void) {
         const initialX = tool.x;
         const initialY = tool.y;
 
         tool.inputEnabled = true;
         tool.input.enableDrag();
+
+        let sparkles: Phaser.Graphics[];
+
+        tool.events.onDragStart.add(() => {
+          sparkles = dots.map(([x, y]) => {
+            const sparkle = game.add.graphics(x + 0.5, y + 0.5);
+            sparkle.alpha = 0.75;
+            sparkle.beginFill(0xffffff);
+            sparkle.drawPolygon([
+              [0, -2.5],
+              [-0.5, -0.5],
+              [-2.5, 0],
+              [-0.5, 0.5],
+              [0, 2.5],
+              [0.5, 0.5],
+              [2.5, 0],
+              [0.5, -0.5]
+            ]);
+            sparkle.endFill();
+            game.add.tween(sparkle.scale).to(
+              { x: 0, y: 0 }, 500, Phaser.Easing.Default, true, 0, -1, true
+            );
+            return sparkle;
+          });
+        });
+
         tool.events.onDragStop.add(() => {
+          sparkles.forEach(sparkle => sparkle.destroy());
+          sparkles = [];
           action(game.input.x, game.input.y);
           tool.x = initialX;
           tool.y = initialY;
@@ -96,7 +124,7 @@ export default function(game: Phaser.Game) {
         baseTween.chain(origTween, beanTween);
         baseTween.start();
 
-        setupTool(toolOrig, (x, y) => {
+        setupTool(toolOrig, [[88, 45]], (x, y) => {
           const vine = new Phaser.Rectangle(82, 40, 12, 12);
           if (beanRight.frame < 1 && vine.contains(x, y)) {
             game.sound.play('snap');
@@ -107,7 +135,7 @@ export default function(game: Phaser.Game) {
             vines.frame = 1;
 
             game.add.tween(toolVine).to({ alpha: 1 }, 500).start();
-            setupTool(toolVine, (x, y) => {
+            setupTool(toolVine, [[88, 45]], (x, y) => {
               if (vine.contains(x, y)) {
                 const darken = game.add.graphics();
                 darken.beginFill(0x000000);
@@ -125,7 +153,7 @@ export default function(game: Phaser.Game) {
             });
           }
         });
-        setupTool(toolBean, (x, y) => {
+        setupTool(toolBean, [[56, 63], [77, 63]], (x, y) => {
           if (leftBean.contains(x, y)) {
             growths++;
             game.sound.play('grow' + growths);
