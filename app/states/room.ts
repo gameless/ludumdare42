@@ -1,3 +1,4 @@
+import { Highlight } from '../highlight';
 import { Music, startState } from '../music';
 
 export default function(game: Phaser.Game) {
@@ -5,7 +6,7 @@ export default function(game: Phaser.Game) {
 
   let beanLeft: Phaser.Sprite;
   let beanRight: Phaser.Sprite;
-  let hl: Phaser.BitmapData;
+  let highlight: Highlight;
 
   const leftBean = new Phaser.Rectangle(53, 53, 8, 15);
   const rightBean = new Phaser.Rectangle(73, 53, 8, 15);
@@ -31,8 +32,16 @@ export default function(game: Phaser.Game) {
       const plant = game.add.sprite(0, 0, 'room_plant');
       game.add.image(0, 0, 'room_pot');
 
-      hl = game.make.bitmapData(160, 90);
-      game.add.image(0, 0, hl);
+      highlight = new Highlight(game, (x, y) => {
+        if (!ateBean) {
+          if (leftBean.contains(x, y)) {
+            return beanLeft;
+          } else if (rightBean.contains(x, y)) {
+            return beanRight;
+          }
+        }
+        return null;
+      });
 
       const toolbar = game.add.image(0, 0, 'room_toolbar');
       const toolOrig = game.add.image(1, 2, 'room_toolorig');
@@ -141,7 +150,7 @@ export default function(game: Phaser.Game) {
 
                 const innerTimer = game.time.create();
                 innerTimer.add(1000, () => {
-                  hl.destroy();
+                  highlight.destroy();
                   startState(game, 'planet', music);
                 });
                 innerTimer.start();
@@ -190,23 +199,7 @@ export default function(game: Phaser.Game) {
     },
 
     render() {
-      hl.clear();
-      hl.blendSourceOver();
-      const alpha = game.input.activePointer.isDown ? 0.75 : 0.5;
-      hl.fill(0xff, 0xff, 0xff, alpha);
-      hl.blendDestinationIn();
-      hl.circle(game.input.x, game.input.y, 10);
-      if (!ateBean) {
-        if (leftBean.contains(game.input.x, game.input.y)) {
-          hl.draw(beanLeft);
-        } else if (rightBean.contains(game.input.x, game.input.y)) {
-          hl.draw(beanRight);
-        } else {
-          hl.clear();
-        }
-      } else {
-        hl.clear()
-      }
+      highlight.render();
     }
   };
 };

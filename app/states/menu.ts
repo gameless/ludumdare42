@@ -1,3 +1,4 @@
+import { Highlight } from '../highlight';
 import { MusicalState, startState } from '../music';
 
 const button = new Phaser.Polygon([
@@ -6,34 +7,27 @@ const button = new Phaser.Polygon([
 
 export default class extends MusicalState {
   // @ts-ignore
-  hl: Phaser.BitmapData;
+  highlight: Highlight;
 
   create() {
-    this.music.setTrack('title');
+    this.music.fadeTrack(500, 'title');
 
     this.game.add.image(0, 0, 'menu_background');
-    this.game.add.image(0, 0, 'menu_start');
+    const buttonSprite = this.game.add.sprite(0, 0, 'menu_start');
 
-    this.hl = this.game.make.bitmapData(160, 90);
-    this.game.add.image(0, 0, this.hl);
+    this.highlight = new Highlight(this.game, (x, y) => {
+      return button.contains(x, y) ? buttonSprite : null;
+    });
 
     this.game.input.onUp.add(() => {
       if (button.contains(this.game.input.x, this.game.input.y)) {
-        this.hl.destroy();
-        startState(this.game, 'pot', this.music);
+        this.highlight.destroy();
+        startState(this.game, 'room', this.music);
       }
     });
   }
 
   render() {
-    this.hl.clear();
-    if (button.contains(this.game.input.x, this.game.input.y)) {
-      this.hl.blendSourceOver();
-      const alpha = this.game.input.activePointer.isDown ? 0.75 : 0.5;
-      this.hl.fill(0xff, 0xff, 0xff, alpha);
-      this.hl.blendDestinationIn();
-      this.hl.circle(this.game.input.x, this.game.input.y, 10);
-      this.hl.draw('menu_start');
-    }
+    this.highlight.render();
   }
 }

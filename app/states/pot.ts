@@ -1,3 +1,4 @@
+import { Highlight } from '../highlight';
 import { Music, startState } from '../music';
 
 export default function(game: Phaser.Game) {
@@ -7,8 +8,7 @@ export default function(game: Phaser.Game) {
   let pot: Phaser.Sprite;
   let fade: Phaser.Tween;
   let hover: Phaser.Signal;
-  let hl: Phaser.BitmapData;
-  let hl_image: Phaser.Image;
+  let highlight: Highlight;
 
   let hovering = false;
   let showCross = true;
@@ -34,9 +34,6 @@ export default function(game: Phaser.Game) {
       rootLeft = game.add.sprite(0, 0, 'pot_rootleft');
       rootRight = game.add.sprite(0, 0, 'pot_rootright');
 
-      hl = game.make.bitmapData(160, 90);
-      hl_image = game.add.image(0, 0, hl);
-
       const plant = game.add.sprite(0, 0, 'pot_plant');
       const blood = game.add.sprite(0, 0, 'pot_blood');
 
@@ -55,6 +52,21 @@ export default function(game: Phaser.Game) {
 
       pot = game.add.sprite(0, 0, 'pot_pot');
       const pot_hl = game.add.image(0, 0, 'pot_pot_hl');
+
+      highlight = new Highlight(game, (x, y) => {
+        if (showCross) {
+          if (hovering) {
+            if (x < 80 && leftGrowth < 4) {
+              return rootLeft;
+            } else if (x >= 80 && rightGrowth < 3) {
+              return rootRight;
+            }
+          }
+        } else if (!shattered) {
+          return pot;
+        }
+        return null;
+      });
 
       hover = new Phaser.Signal();
       hover.add(function() {
@@ -86,8 +98,6 @@ export default function(game: Phaser.Game) {
               music.fadeTrack(500, 'fun2');
 
               pot_hl.destroy();
-              hl_image.destroy();
-              game.add.image(0, 0, hl);
               rootRight.frame = rightGrowth + 1;
               pot.frame = 1;
               showCross = false;
@@ -105,7 +115,6 @@ export default function(game: Phaser.Game) {
             plant.destroy();
             blood.destroy();
             pot.destroy();
-            hl_image.destroy();
 
             const shatterTime = 375;
             const easing = Phaser.Easing.Sinusoidal.InOut;
@@ -161,7 +170,7 @@ export default function(game: Phaser.Game) {
 
               const innerTimer = game.time.create();
               innerTimer.add(1000, () => {
-                hl.destroy();
+                highlight.destroy();
                 startState(game, 'room', music);
               });
               innerTimer.start();
@@ -192,23 +201,7 @@ export default function(game: Phaser.Game) {
     },
 
     render() {
-      hl.clear();
-      hl.blendSourceOver();
-      const alpha = game.input.activePointer.isDown ? 0.75 : 0.5;
-      hl.fill(0xff, 0xff, 0xff, alpha);
-      hl.blendDestinationIn();
-      hl.circle(game.input.x, game.input.y, 10);
-      if (showCross) {
-        if (game.input.x < 80 && leftGrowth < 4) {
-          hl.draw(rootLeft);
-        } else if (game.input.x >= 80 && rightGrowth < 3) {
-          hl.draw(rootRight);
-        } else {
-          hl.clear();
-        }
-      } else {
-        hl.draw(pot);
-      }
+      highlight.render();
     }
   };
 };
