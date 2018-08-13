@@ -1,32 +1,22 @@
-import { Music } from '../music';
+import { MusicalState } from '../music';
 
-export default function(game: Phaser.Game) {
-  let music: Music;
+export default class extends MusicalState {
+  create() {
+    this.music.setTrack('end');
+    this.music.play(false);
 
-  return {
-    init(theMusic: Music) {
-      music = theMusic;
-    },
+    const dieTimer = this.game.time.create();
+    dieTimer.add(18000, () => this.game.state.start('credits'));
+    dieTimer.start();
 
-    create() {
-      music.setTrack('end');
-      music.play();
+    const planet = this.game.add.sprite(0, 0, 'planet_animation');
+    planet.animations.add('die');
+    planet.animations.play('die', 0.25);
 
-      const dieTimer = game.time.create();
-      dieTimer.add(18000, () => {
-        game.state.start('credits');
-      });
-      dieTimer.start();
-
-      const planet = game.add.sprite(0, 0, 'planet_animation');
-      planet.animations.add('die');
-      planet.animations.play('die', 0.25);
-
-      const darken = game.add.graphics();
-      darken.beginFill(0x000000);
-      darken.drawRect(0, 0, 160, 90);
-      darken.endFill();
-      game.add.tween(darken).to({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
-    }
-  };
-};
+    const darken = this.game.add.graphics();
+    darken.beginFill(0x000000);
+    darken.drawRect(0, 0, 160, 90);
+    darken.endFill();
+    this.game.add.tween(darken).to({ alpha: 0 }, 1000).start();
+  }
+}

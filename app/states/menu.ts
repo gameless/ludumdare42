@@ -11,6 +11,7 @@ export default class extends MusicalState {
 
   create() {
     this.music.fadeTrack(500, 'title');
+    this.music.play(true);
 
     this.game.add.image(0, 0, 'menu_background');
     const buttonSprite = this.game.add.sprite(0, 0, 'menu_start');

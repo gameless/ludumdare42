@@ -11,9 +11,11 @@ class Track {
     this.portion = 0;
   }
 
-  play() {
+  play(loop: boolean) {
+    this.good.loop = loop;
     this.good.play();
     if (!this.same) {
+      this.bad.loop = loop;
       this.bad.play();
     }
   }
@@ -28,16 +30,12 @@ class Track {
   }
 }
 
-function addLoop(game: Phaser.Game, key: string) {
-  return game.sound.add(key, 0, true);
-}
-
 function getTrack(game: Phaser.Game, key: string) {
   const goodKey = 'music_' + key;
   const badKey = goodKey + '_bitcrushed';
   const same = !game.cache.checkSoundKey(badKey);
-  const good = addLoop(game, goodKey);
-  const bad = addLoop(game, badKey);
+  const good = game.sound.add(goodKey, 0);
+  const bad = game.sound.add(badKey, 0);
   return new Track(good, same ? good : bad, same);
 }
 
@@ -51,8 +49,8 @@ export class Music {
     this.badness = 0;
   }
 
-  play() {
-    _.forOwn(this.tracks, track => track.play());
+  play(loop: boolean) {
+    _.forOwn(this.tracks, track => track.play(loop));
   }
 
   updateVolumes() {

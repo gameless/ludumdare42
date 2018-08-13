@@ -68,12 +68,6 @@ function soundsReady(game: Phaser.Game) {
 
 const tracks = ['title', 'fun1', 'fun2', 'fun3', 'fun4', 'end'];
 
-function startMusic(game: Phaser.Game) {
-  const music = new Music(game, tracks);
-  music.play();
-  return music;
-}
-
 function sceneImageLoader(prefix: string, path: string) {
   return (game: Phaser.Game, key: string, filename: string) => {
     game.load.image(
@@ -172,7 +166,7 @@ export default function(game: Phaser.Game) {
 
     update() {
       if (soundsReady(game)) {
-        startState(game, 'menu', startMusic(game));
+        startState(game, 'menu', new Music(game, tracks));
       }
     }
   };
