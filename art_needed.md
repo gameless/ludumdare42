@@ -1,11 +1,6 @@
 Art Needed
 ==========
 
-Misc
-----
-
-- some sort of loading bar
-
 Room
 ----
 
