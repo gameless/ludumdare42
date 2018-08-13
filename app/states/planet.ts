@@ -9,8 +9,8 @@ export default function(game: Phaser.Game) {
     },
 
     create() {
-      music.tracks['fun4'].good.fadeTo(500, 0);
-      music.tracks['end'].good.play('', 0, 1, false);
+      music.setTrack('end');
+      music.play();
 
       const dieTimer = game.time.create();
       dieTimer.add(18000, () => {

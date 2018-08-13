@@ -20,8 +20,7 @@ export default function(game: Phaser.Game) {
     },
 
     create() {
-      music.tracks['fun2'].good.fadeTo(500, 0);
-      music.tracks['fun3'].good.fadeTo(500, 1);
+      music.fadeTrack(500, 'fun3');
 
       game.add.image(0, 0, 'room_bg');
       const vines = game.add.sprite(0, 0, 'room_vines');
@@ -127,8 +126,7 @@ export default function(game: Phaser.Game) {
           if (beanRight.frame < 1 && vine.contains(x, y)) {
             game.sound.play('effect_snap');
 
-            music.tracks['fun3'].good.fadeTo(500, 0);
-            music.tracks['fun4'].good.fadeTo(500, 1);
+            music.fadeTrack(500, 'fun4');
 
             vines.frame = 1;
 

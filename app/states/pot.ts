@@ -23,8 +23,7 @@ export default function(game: Phaser.Game) {
     },
 
     create() {
-      music.tracks['title'].good.fadeTo(500, 0);
-      music.tracks['fun1'].good.fadeTo(500, 1);
+      music.fadeTrack(500, 'fun1');
 
       game.add.image(0, 0, 'pot_bg');
       game.add.image(0, 0, 'pot_shelf');
@@ -45,8 +44,7 @@ export default function(game: Phaser.Game) {
       blood.animations.play('spread', 0.5);
       const wiltTimer = game.time.create();
       wiltTimer.add(16000, () => {
-        music.tracks['fun1'].good.fadeTo(8000, 0);
-        music.tracks['fun1'].bad.fadeTo(8000, 1);
+        music.fadeBadness(8000, 1);
 
         if (!shattered) {
           plant.animations.add('wilt');
@@ -85,8 +83,7 @@ export default function(game: Phaser.Game) {
             }
 
             if (leftGrowth === 4 && rightGrowth === 3) {
-              music.tracks['fun1'].good.fadeTo(500, 0);
-              music.tracks['fun2'].good.fadeTo(500, 1);
+              music.fadeTrack(500, 'fun2');
 
               pot_hl.destroy();
               hl_image.destroy();

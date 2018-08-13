@@ -9,7 +9,7 @@ export default class extends MusicalState {
   hl: Phaser.BitmapData;
 
   create() {
-    this.music.tracks['title'].good.volume = 1;
+    this.music.setTrack('title');
 
     this.game.add.image(0, 0, 'menu_background');
     this.game.add.image(0, 0, 'menu_start');
