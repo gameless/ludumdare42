@@ -148,6 +148,37 @@ var __makeRelativeRequire = function(require, mappings, pref) {
     return require(name);
   }
 };
+require.register("highlight.ts", function(exports, require, module) {
+"use strict";
+var Highlight = (function () {
+    function Highlight(game, target) {
+        this.game = game;
+        this.target = target;
+        this.bmd = game.make.bitmapData(160, 90);
+        game.add.image(0, 0, this.bmd);
+    }
+    Highlight.prototype.render = function () {
+        this.bmd.clear();
+        var target = this.target(this.game.input.x, this.game.input.y);
+        if (target) {
+            this.bmd.blendSourceOver();
+            var alpha = this.game.input.activePointer.isDown ? 0.75 : 0.5;
+            this.bmd.fill(0xff, 0xff, 0xff, alpha);
+            this.bmd.blendDestinationIn();
+            this.bmd.circle(this.game.input.x, this.game.input.y, 10);
+            this.bmd.draw(target);
+        }
+    };
+    Highlight.prototype.destroy = function () {
+        this.bmd.destroy();
+    };
+    return Highlight;
+}());
+exports.Highlight = Highlight;
+
+
+});
+
 require.register("initialize.ts", function(exports, require, module) {
 /// <reference path="../node_modules/phaser-ce/typescript/phaser.d.ts"/>
 "use strict";
@@ -184,9 +215,11 @@ var Track = (function () {
         this.same = same;
         this.portion = 0;
     }
-    Track.prototype.play = function () {
+    Track.prototype.play = function (loop) {
+        this.good.loop = loop;
         this.good.play();
         if (!this.same) {
+            this.bad.loop = loop;
             this.bad.play();
         }
     };
@@ -201,15 +234,12 @@ var Track = (function () {
     };
     return Track;
 }());
-function addLoop(game, key) {
-    return game.sound.add(key, 0, true);
-}
 function getTrack(game, key) {
     var goodKey = 'music_' + key;
     var badKey = goodKey + '_bitcrushed';
     var same = !game.cache.checkSoundKey(badKey);
-    var good = addLoop(game, goodKey);
-    var bad = addLoop(game, badKey);
+    var good = game.sound.add(goodKey, 0);
+    var bad = game.sound.add(badKey, 0);
     return new Track(good, same ? good : bad, same);
 }
 var Music = (function () {
@@ -220,8 +250,8 @@ var Music = (function () {
         keys.forEach(function (key) { return _this.tracks[key] = getTrack(game, key); });
         this.badness = 0;
     }
-    Music.prototype.play = function () {
-        _.forOwn(this.tracks, function (track) { return track.play(); });
+    Music.prototype.play = function (loop) {
+        _.forOwn(this.tracks, function (track) { return track.play(loop); });
     };
     Music.prototype.updateVolumes = function () {
         var _this = this;
@@ -280,12 +310,7 @@ function default_1(game) {
     return {
         create: function () {
             var text = game.add.image(0, 0, 'credits');
-            text.alpha = 0;
-            var fadeInTimer = game.time.create();
-            fadeInTimer.add(1000, function () {
-                game.add.tween(text).to({ alpha: 1 }, 2000).start();
-            });
-            fadeInTimer.start();
+            game.add.tween(text).from({ alpha: 0 }, 2000).delay(1000).start();
         }
     };
 }
@@ -362,11 +387,6 @@ function soundsReady(game) {
     });
 }
 var tracks = ['title', 'fun1', 'fun2', 'fun3', 'fun4', 'end'];
-function startMusic(game) {
-    var music = new music_1.Music(game, tracks);
-    music.play();
-    return music;
-}
 function sceneImageLoader(prefix, path) {
     return function (game, key, filename) {
         game.load.image(prefix + '_' + key, 'Image/' + path + '/' + filename + '.png');
@@ -440,7 +460,7 @@ function default_1(game) {
         },
         update: function () {
             if (soundsReady(game)) {
-                music_1.startState(game, 'menu', startMusic(game));
+                music_1.startState(game, 'menu', new music_1.Music(game, tracks));
             }
         }
     };
@@ -459,6 +479,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var highlight_1 = require("../highlight");
 var music_1 = require("../music");
 var button = new Phaser.Polygon([
     [16, 25], [13, 57], [145, 64], [145, 30]
@@ -473,28 +494,22 @@ var default_1 = (function (_super) {
     }
     default_1.prototype.create = function () {
         var _this = this;
-        this.music.setTrack('title');
+        this.music.fadeTrack(500, 'title');
+        this.music.play(true);
         this.game.add.image(0, 0, 'menu_background');
-        this.game.add.image(0, 0, 'menu_start');
-        this.hl = this.game.make.bitmapData(160, 90);
-        this.game.add.image(0, 0, this.hl);
+        var buttonSprite = this.game.add.sprite(0, 0, 'menu_start');
+        this.highlight = new highlight_1.Highlight(this.game, function (x, y) {
+            return button.contains(x, y) ? buttonSprite : null;
+        });
         this.game.input.onUp.add(function () {
             if (button.contains(_this.game.input.x, _this.game.input.y)) {
-                _this.hl.destroy();
+                _this.highlight.destroy();
                 music_1.startState(_this.game, 'pot', _this.music);
             }
         });
     };
     default_1.prototype.render = function () {
-        this.hl.clear();
-        if (button.contains(this.game.input.x, this.game.input.y)) {
-            this.hl.blendSourceOver();
-            var alpha = this.game.input.activePointer.isDown ? 0.75 : 0.5;
-            this.hl.fill(0xff, 0xff, 0xff, alpha);
-            this.hl.blendDestinationIn();
-            this.hl.circle(this.game.input.x, this.game.input.y, 10);
-            this.hl.draw('menu_start');
-        }
+        this.highlight.render();
     };
     return default_1;
 }(music_1.MusicalState));
@@ -506,40 +521,44 @@ exports.default = default_1;
 
 require.register("states/planet.ts", function(exports, require, module) {
 "use strict";
-function default_1(game) {
-    var music;
-    return {
-        init: function (theMusic) {
-            music = theMusic;
-        },
-        create: function () {
-            music.setTrack('end');
-            music.play();
-            var dieTimer = game.time.create();
-            dieTimer.add(18000, function () {
-                game.state.start('credits');
-            });
-            dieTimer.start();
-            var planet = game.add.sprite(0, 0, 'planet_animation');
-            planet.animations.add('die');
-            planet.animations.play('die', 0.25);
-            var darken = game.add.graphics();
-            darken.beginFill(0x000000);
-            darken.drawRect(0, 0, 160, 90);
-            darken.endFill();
-            game.add.tween(darken).to({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
-        }
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var music_1 = require("../music");
+var default_1 = (function (_super) {
+    __extends(default_1, _super);
+    function default_1() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    default_1.prototype.create = function () {
+        var _this = this;
+        this.music.setTrack('end');
+        this.music.play(false);
+        var dieTimer = this.game.time.create();
+        dieTimer.add(18000, function () { return _this.game.state.start('credits'); });
+        dieTimer.start();
+        var planet = this.game.add.sprite(0, 0, 'planet_animation');
+        planet.animations.add('die');
+        planet.animations.play('die', 0.25);
+        var darken = this.game.add.graphics();
+        darken.beginFill(0x000000);
+        darken.drawRect(0, 0, 160, 90);
+        darken.endFill();
+        this.game.add.tween(darken).to({ alpha: 0 }, 1000).start();
     };
-}
+    return default_1;
+}(music_1.MusicalState));
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
-;
 
 
 });
 
 require.register("states/pot.ts", function(exports, require, module) {
 "use strict";
+var highlight_1 = require("../highlight");
 var music_1 = require("../music");
 function default_1(game) {
     var music;
@@ -548,8 +567,7 @@ function default_1(game) {
     var pot;
     var fade;
     var hover;
-    var hl;
-    var hl_image;
+    var highlight;
     var hovering = false;
     var showCross = true;
     var shattered = false;
@@ -568,8 +586,6 @@ function default_1(game) {
             var root = game.add.image(0, 0, 'pot_root');
             rootLeft = game.add.sprite(0, 0, 'pot_rootleft');
             rootRight = game.add.sprite(0, 0, 'pot_rootright');
-            hl = game.make.bitmapData(160, 90);
-            hl_image = game.add.image(0, 0, hl);
             var plant = game.add.sprite(0, 0, 'pot_plant');
             var blood = game.add.sprite(0, 0, 'pot_blood');
             blood.animations.add('spread');
@@ -585,6 +601,22 @@ function default_1(game) {
             wiltTimer.start();
             pot = game.add.sprite(0, 0, 'pot_pot');
             var pot_hl = game.add.image(0, 0, 'pot_pot_hl');
+            highlight = new highlight_1.Highlight(game, function (x, _) {
+                if (showCross) {
+                    if (hovering) {
+                        if (x < 80 && leftGrowth < 4) {
+                            return rootLeft;
+                        }
+                        else if (x >= 80 && rightGrowth < 3) {
+                            return rootRight;
+                        }
+                    }
+                }
+                else if (!shattered) {
+                    return pot;
+                }
+                return null;
+            });
             hover = new Phaser.Signal();
             hover.add(function () {
                 var newAlpha = (hovering && showCross) ? 0 : 1;
@@ -611,8 +643,6 @@ function default_1(game) {
                         if (leftGrowth === 4 && rightGrowth === 3) {
                             music.fadeTrack(500, 'fun2');
                             pot_hl.destroy();
-                            hl_image.destroy();
-                            game.add.image(0, 0, hl);
                             rootRight.frame = rightGrowth + 1;
                             pot.frame = 1;
                             showCross = false;
@@ -629,7 +659,6 @@ function default_1(game) {
                         plant.destroy();
                         blood.destroy();
                         pot.destroy();
-                        hl_image.destroy();
                         var shatterTime = 375;
                         var easing = Phaser.Easing.Sinusoidal.InOut;
                         var backshards_1 = [];
@@ -675,7 +704,7 @@ function default_1(game) {
                             game.camera.flash(0xffffff, 500);
                             var innerTimer = game.time.create();
                             innerTimer.add(1000, function () {
-                                hl.destroy();
+                                highlight.destroy();
                                 music_1.startState(game, 'room', music);
                             });
                             innerTimer.start();
@@ -706,26 +735,7 @@ function default_1(game) {
             }
         },
         render: function () {
-            hl.clear();
-            hl.blendSourceOver();
-            var alpha = game.input.activePointer.isDown ? 0.75 : 0.5;
-            hl.fill(0xff, 0xff, 0xff, alpha);
-            hl.blendDestinationIn();
-            hl.circle(game.input.x, game.input.y, 10);
-            if (showCross) {
-                if (game.input.x < 80 && leftGrowth < 4) {
-                    hl.draw(rootLeft);
-                }
-                else if (game.input.x >= 80 && rightGrowth < 3) {
-                    hl.draw(rootRight);
-                }
-                else {
-                    hl.clear();
-                }
-            }
-            else {
-                hl.draw(pot);
-            }
+            highlight.render();
         }
     };
 }
@@ -738,12 +748,13 @@ exports.default = default_1;
 
 require.register("states/room.ts", function(exports, require, module) {
 "use strict";
+var highlight_1 = require("../highlight");
 var music_1 = require("../music");
 function default_1(game) {
     var music;
     var beanLeft;
     var beanRight;
-    var hl;
+    var highlight;
     var leftBean = new Phaser.Rectangle(53, 53, 8, 15);
     var rightBean = new Phaser.Rectangle(73, 53, 8, 15);
     var choseBean = false;
@@ -763,8 +774,17 @@ function default_1(game) {
             game.add.image(0, 0, 'room_int');
             var plant = game.add.sprite(0, 0, 'room_plant');
             game.add.image(0, 0, 'room_pot');
-            hl = game.make.bitmapData(160, 90);
-            game.add.image(0, 0, hl);
+            highlight = new highlight_1.Highlight(game, function (x, y) {
+                if (!ateBean) {
+                    if (leftBean.contains(x, y)) {
+                        return beanLeft;
+                    }
+                    else if (rightBean.contains(x, y)) {
+                        return beanRight;
+                    }
+                }
+                return null;
+            });
             var toolbar = game.add.image(0, 0, 'room_toolbar');
             var toolOrig = game.add.image(1, 2, 'room_toolorig');
             var toolBean = game.add.image(12, 1, 'room_toolbean');
@@ -855,7 +875,7 @@ function default_1(game) {
                                 game.add.tween(darken_1).from({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
                                 var innerTimer = game.time.create();
                                 innerTimer.add(1000, function () {
-                                    hl.destroy();
+                                    highlight.destroy();
                                     music_1.startState(game, 'planet', music);
                                 });
                                 innerTimer.start();
@@ -903,26 +923,7 @@ function default_1(game) {
             timer.start();
         },
         render: function () {
-            hl.clear();
-            hl.blendSourceOver();
-            var alpha = game.input.activePointer.isDown ? 0.75 : 0.5;
-            hl.fill(0xff, 0xff, 0xff, alpha);
-            hl.blendDestinationIn();
-            hl.circle(game.input.x, game.input.y, 10);
-            if (!ateBean) {
-                if (leftBean.contains(game.input.x, game.input.y)) {
-                    hl.draw(beanLeft);
-                }
-                else if (rightBean.contains(game.input.x, game.input.y)) {
-                    hl.draw(beanRight);
-                }
-                else {
-                    hl.clear();
-                }
-            }
-            else {
-                hl.clear();
-            }
+            highlight.render();
         }
     };
 }
