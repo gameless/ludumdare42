@@ -1,4 +1,5 @@
 import { delay } from '../delay';
+import { fadeIn, fadeOut } from '../fade';
 import { Highlight } from '../highlight';
 import { Music, startState } from '../music';
 
@@ -94,11 +95,7 @@ export default function(game: Phaser.Game) {
         });
       }
 
-      const darken = game.add.graphics();
-      darken.beginFill(0x000000);
-      darken.drawRect(0, 0, 160, 90);
-      darken.endFill();
-      game.add.tween(darken).to({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
+      fadeIn(game, 1000);
 
       plant.animations.add('fall', [0, 1, 2]);
       plant.animations.play('fall', 2);
@@ -141,11 +138,7 @@ export default function(game: Phaser.Game) {
             game.add.tween(toolVine).to({ alpha: 1 }, 500).start();
             setupTool(toolVine, [[88, 45]], (x, y) => {
               if (vine.contains(x, y)) {
-                const darken = game.add.graphics();
-                darken.beginFill(0x000000);
-                darken.drawRect(0, 0, 160, 90);
-                darken.endFill();
-                game.add.tween(darken).from({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
+                fadeOut(game, 1000);
 
                 delay(game, 1000, () => {
                   highlight.destroy();

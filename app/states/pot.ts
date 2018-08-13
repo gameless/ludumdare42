@@ -1,105 +1,169 @@
+import * as _ from 'lodash';
+
 import { delay } from '../delay';
+import { fadeIn, fadeOut } from '../fade';
 import { Highlight } from '../highlight';
-import { MusicalState, startState } from '../music';
+import { Music, MusicalState, startState } from '../music';
+
+const closeToPot = new Phaser.Polygon([
+  [37, 44],
+  [50, 81],
+  [67, 86],
+  [89, 86],
+  [105, 80],
+  [114, 44],
+  [100, 33],
+  [50, 33]
+].map(([x, y]) => new Phaser.Point(x, y)));
+
+const backshardDeltas = [
+  [-16, -15], [1, -20], [15, -20], [-14, 3], [3, -7], [30, -1]
+];
+
+const frontshardDeltas = [
+  [-29, -5], [-2, -3], [14, -8], [23, -14], [-20, 3], [15, 2]
+];
 
 export default class extends MusicalState {
-  // @ts-ignore
-  hover: Phaser.Signal;
+  startFade = false;
+
   // @ts-ignore
   highlight: Highlight;
 
-  hovering = false;
-  shattered = false;
+  init(music: Music, startFade: boolean) {
+    super.init(music);
+    this.startFade = startFade;
+  }
 
-  create() {
-    const self = this;
-
-    self.music.fadeTrack(500, 'fun1');
-
-    self.game.add.image(0, 0, 'pot_bg');
-    self.game.add.image(0, 0, 'pot_shelf');
-    self.game.add.image(0, 0, 'pot_shelf_hl');
-    let showCross = true;
-    const potCross = self.game.add.image(0, 0, 'pot_cross');
-
-    const root = self.game.add.image(0, 0, 'pot_root');
-    let leftGrowth = 0;
-    const rootLeft = self.game.add.sprite(0, 0, 'pot_rootleft');
-    let rightGrowth = 0;
-    const rootRight = self.game.add.sprite(0, 0, 'pot_rootright');
-
-    const plant = self.game.add.sprite(0, 0, 'pot_plant');
-    const blood = self.game.add.sprite(0, 0, 'pot_blood');
-
+  startBlood(plant: Phaser.Sprite, blood: Phaser.Sprite) {
+    let shattered = false;
     blood.animations.add('spread');
     blood.animations.play('spread', 0.5);
-    delay(self.game, 16000, () => {
-      self.music.fadeBadness(8000, 1);
-
-      if (!self.shattered) {
-        plant.animations.add('wilt');
-        plant.animations.play('wilt', 0.25);
+    delay(this.game, 16000, () => {
+      this.music.fadeBadness(8000, 1);
+      if (!shattered) {
+        plant.animations.add('wilt').play(0.25);
+        delay(this.game, 8000, () => {
+          if (!shattered) {
+            fadeOut(this.game, 1000);
+            delay(this.game, 1000, () => {
+              startState(this.game, 'pot', this.music);
+            });
+          }
+        });
       }
     });
+    return () => shattered = true;
+  }
 
-    const pot = self.game.add.sprite(0, 0, 'pot_pot');
-    const pot_hl = self.game.add.image(0, 0, 'pot_pot_hl');
+  startCross(pot: Phaser.Sprite) {
+    let fade: Phaser.Tween;
+    let braced = false;
+    let hovering = false;
+    this.game.input.addMoveCallback(() => {
+      const x = this.game.input.x;
+      const y = this.game.input.y;
+      const nowHovering = closeToPot.contains(x, y);
+      if (!braced && nowHovering !== hovering) {
+        hovering = nowHovering;
+        const newAlpha = hovering ? 0 : 1;
+        const time = Math.abs(newAlpha - pot.alpha) * 250;
+        if (fade) {
+          fade.stop();
+        }
+        fade = this.game.add.tween(pot);
+        fade.to({ alpha: newAlpha }, time).start();
+      }
+    }, this);
+    return () => {
+      braced = true;
+      fade.to({ alpha: 1 }, (1 - pot.alpha) * 250).start();
+    };
+  }
 
-    self.highlight = new Highlight(self.game, (x, _) => {
-      if (showCross) {
-        if (self.hovering) {
-          if (x < 80 && leftGrowth < 4) {
-            return rootLeft;
-          } else if (x >= 80 && rightGrowth < 3) {
-            return rootRight;
+  create() {
+    this.music.fadeTrack(500, 'fun1');
+    this.music.fadeBadness(500, 0);
+
+    this.game.add.image(0, 0, 'pot_bg');
+    this.game.add.image(0, 0, 'pot_shelf');
+    this.game.add.image(0, 0, 'pot_shelf_hl');
+    const potCross = this.game.add.image(0, 0, 'pot_cross');
+    const root = this.game.add.image(0, 0, 'pot_root');
+    const rootLeft = this.game.add.sprite(0, 0, 'pot_rootleft');
+    const rootRight = this.game.add.sprite(0, 0, 'pot_rootright');
+    const plant = this.game.add.sprite(0, 0, 'pot_plant');
+    const blood = this.game.add.sprite(0, 0, 'pot_blood');
+    const pot = this.game.add.sprite(0, 0, 'pot_pot');
+    const pot_hl = this.game.add.image(0, 0, 'pot_pot_hl');
+
+    let leftGrowth = 0;
+    let rightGrowth = 0;
+    let braced = false;
+    let shattered = false;
+
+    this.highlight = new Highlight(this.game, (x, y) => {
+      if (!braced) {
+        if (closeToPot.contains(x, y)) {
+          if (x < 80) {
+            if (leftGrowth < 4) {
+              return rootLeft;
+            }
+          } else {
+            if (rightGrowth < 3) {
+              return rootRight
+            }
           }
         }
-      } else if (!self.shattered) {
+      } else if (!shattered) {
         return pot;
       }
       return null;
     });
 
-    let fade: Phaser.Tween;
-    self.hover = new Phaser.Signal();
-    self.hover.add(function() {
-      const newAlpha = (self.hovering && showCross) ? 0 : 1;
-      const time = Math.abs(newAlpha - pot.alpha) * 250;
-      if (fade) {
-        fade.stop();
-      }
-      fade = self.game.add.tween(pot);
-      fade.to({ alpha: newAlpha }, time).start();
-    });
+    if (this.startFade) {
+      fadeIn(this.game, 1000);
+    }
 
-    self.game.input.onUp.add(function() {
-      if (self.hovering) {
-        if (showCross) {
-          if (self.game.input.x < 80 && leftGrowth < 4) {
-            leftGrowth++;
-            self.game.sound.play('effect_root' + (leftGrowth + rightGrowth));
-            rootLeft.frame = leftGrowth;
+    const stopBlood = this.startBlood(plant, blood);
+    const stopCross = this.startCross(pot);
+
+    this.game.input.onUp.add(() => {
+      if (closeToPot.contains(this.game.input.x, this.game.input.y)) {
+        if (!braced) {
+          let grew = false;
+          if (this.game.input.x < 80) {
+            if (leftGrowth < 4) {
+              leftGrowth++;
+              rootLeft.frame = leftGrowth;
+              grew = true;
+            }
+          } else {
+            if (rightGrowth < 3) {
+              rightGrowth++;
+              rootRight.frame = rightGrowth;
+              grew = true;
+            }
           }
-
-          if (self.game.input.x >= 80 && rightGrowth < 3) {
-            rightGrowth++;
-            self.game.sound.play('effect_root' + (leftGrowth + rightGrowth));
-            rootRight.frame = rightGrowth;
+          if (grew) {
+            this.game.sound.play('effect_root' + (leftGrowth + rightGrowth));
           }
 
           if (leftGrowth === 4 && rightGrowth === 3) {
-            self.music.fadeTrack(500, 'fun2');
-
+            braced = true;
+            stopCross();
+            this.music.fadeTrack(500, 'fun2');
             pot_hl.destroy();
             rootRight.frame = rightGrowth + 1;
             pot.frame = 1;
-            showCross = false;
-            self.hover.dispatch();
           }
-        } else if (!self.shattered) {
-          self.shattered = true;
+        } else if (!shattered) {
+          shattered = true;
+          stopBlood();
 
-          self.game.sound.play('effect_shatter');
+          this.music.fadeBadness(500, 0);
+
+          this.game.sound.play('effect_shatter');
 
           potCross.destroy();
           root.destroy();
@@ -112,81 +176,43 @@ export default class extends MusicalState {
           const shatterTime = 375;
           const easing = Phaser.Easing.Sinusoidal.InOut;
 
-          const backshards: Phaser.Image[] = [];
-          backshards.push(self.game.add.image(0, 0, 'pot_backshard1'));
-          backshards.push(self.game.add.image(0, 0, 'pot_backshard2'));
-          backshards.push(self.game.add.image(0, 0, 'pot_backshard3'));
-          backshards.push(self.game.add.image(0, 0, 'pot_backshard4'));
-          backshards.push(self.game.add.image(0, 0, 'pot_backshard5'));
-          backshards.push(self.game.add.image(0, 0, 'pot_backshard6'));
+          const backshards = _.range(1, 7).map(i => {
+            const shard = this.game.add.image(0, 0, 'pot_backshard' + i);
+            const [x, y] = backshardDeltas[i - 1];
+            const tween = this.game.add.tween(shard);
+            tween.to({ x: x, y: y }, shatterTime, easing, true);
+            return shard;
+          });
+          const float = this.game.add.image(0, 0, 'pot_float');
+          const frontshards = _.range(1, 7).map(i => {
+            const shard = this.game.add.image(0, 0, 'pot_frontshard' + i);
+            const [x, y] = frontshardDeltas[i - 1];
+            const tween = this.game.add.tween(shard);
+            tween.to({ x: x, y: y }, shatterTime, easing, true);
+            return shard;
+          });
 
-          const float = self.game.add.image(0, 0, 'pot_float');
-
-          const frontshards: Phaser.Image[] = [];
-          frontshards.push(self.game.add.image(0, 0, 'pot_frontshard1'));
-          frontshards.push(self.game.add.image(0, 0, 'pot_frontshard2'));
-          frontshards.push(self.game.add.image(0, 0, 'pot_frontshard3'));
-          frontshards.push(self.game.add.image(0, 0, 'pot_frontshard4'));
-          frontshards.push(self.game.add.image(0, 0, 'pot_frontshard5'));
-          frontshards.push(self.game.add.image(0, 0, 'pot_frontshard6'));
-
-          self.game.add.tween(backshards[0]).to({ x: -16, y: -15 }, shatterTime, easing, true);
-          self.game.add.tween(backshards[1]).to({ x: 1, y: -20 }, shatterTime, easing, true);
-          self.game.add.tween(backshards[2]).to({ x: 15, y: -20 }, shatterTime, easing, true);
-          self.game.add.tween(backshards[3]).to({ x: -14, y: 3 }, shatterTime, easing, true);
-          self.game.add.tween(backshards[4]).to({ x: 3, y: -7 }, shatterTime, easing, true);
-          self.game.add.tween(backshards[5]).to({ x: 30, y: -1 }, shatterTime, easing, true);
-          self.game.add.tween(frontshards[0]).to({ x: -29, y: -5 }, shatterTime, easing, true);
-          self.game.add.tween(frontshards[1]).to({ x: -2, y: -3 }, shatterTime, easing, true);
-          self.game.add.tween(frontshards[2]).to({ x: 14, y: -8 }, shatterTime, easing, true);
-          self.game.add.tween(frontshards[3]).to({ x: 23, y: -14 }, shatterTime, easing, true);
-          self.game.add.tween(frontshards[4]).to({ x: -20, y: 3 }, shatterTime, easing, true);
-          self.game.add.tween(frontshards[5]).to({ x: 15, y: 2 }, shatterTime, easing, true);
-
-          delay(self.game, shatterTime, () => {
+          delay(this.game, shatterTime, () => {
             backshards.forEach(shard => shard.destroy());
             float.destroy();
             frontshards.forEach(shard => shard.destroy());
 
-            const fall = self.game.add.image(0, 0, 'pot_fall');
-            self.game.add.tween(fall).to({ y: 50 }, 1000, Phaser.Easing.Quadratic.In, true);
-            self.game.add.image(0, 0, 'pot_mess');
+            const fall = this.game.add.image(0, 0, 'pot_fall');
+            const fallTween = this.game.add.tween(fall)
+            fallTween.to({ y: 50 }, 1000, Phaser.Easing.Quadratic.In, true);
+            this.game.add.image(0, 0, 'pot_mess');
 
-            const darken = self.game.add.graphics();
-            darken.beginFill(0x000000);
-            darken.drawRect(0, 0, 160, 90);
-            darken.endFill();
-            self.game.add.tween(darken).from({ alpha: 0 }, 1000).start();
+            fadeOut(this.game, 1000);
+            this.game.camera.flash(0xffffff, 500);
 
-            self.game.camera.flash(0xffffff, 500);
-
-            delay(self.game, 1000, () => {
-              self.highlight.destroy();
-              startState(self.game, 'room', self.music);
+            delay(this.game, 1000, () => {
+              this.highlight.destroy();
+              startState(this.game, 'room', this.music);
             });
           });
         }
       }
     });
-  }
-
-  update() {
-    const closeToPot = new Phaser.Polygon([
-      [37, 44],
-      [50, 81],
-      [67, 86],
-      [89, 86],
-      [105, 80],
-      [114, 44],
-      [100, 33],
-      [50, 33]
-    ].map(([x, y]) => new Phaser.Point(x, y)));
-
-    const hoveringNow = closeToPot.contains(this.game.input.x, this.game.input.y);
-    if (hoveringNow !== this.hovering) {
-      this.hovering = hoveringNow;
-      this.hover.dispatch();
-    }
   }
 
   render() {
