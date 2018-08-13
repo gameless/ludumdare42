@@ -22,7 +22,7 @@ export default class extends MusicalState {
     this.game.input.onUp.add(() => {
       if (button.contains(this.game.input.x, this.game.input.y)) {
         this.highlight.destroy();
-        startState(this.game, 'room', this.music);
+        startState(this.game, 'pot', this.music);
       }
     });
   }
