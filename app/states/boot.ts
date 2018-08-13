@@ -14,6 +14,7 @@ export default function(game: Phaser.Game) {
       loadAudio('music3', 'Music/Fun3');
       loadAudio('music4', 'Music/Fun4');
       loadAudio('music5', 'Music/LongEndHalfWhirr');
+      loadAudio('music6', 'Music/Fun1Bitcrushed');
 
       game.load.image('menu_background', 'Image/menu/startmenubackground.png');
       game.load.image('menu_start', 'Image/menu/startmenu.png');
@@ -39,7 +40,6 @@ export default function(game: Phaser.Game) {
       game.load.image('pot_cross', 'Image/scene1/pottransparent.png');
       game.load.image('pot_root', 'Image/scene1/root1.png');
       game.load.image('pot_pot_hl', 'Image/scene1/pothighlighting.png');
-      game.load.image('pot_plant', 'Image/scene1/plant1.png');
 
       game.load.image('pot_backshard1', 'Image/scene1/potbreaking shards/backshard1start.png');
       game.load.image('pot_backshard2', 'Image/scene1/potbreaking shards/backshard2start.png');
@@ -58,6 +58,8 @@ export default function(game: Phaser.Game) {
       game.load.image('pot_mess', 'Image/scene1/potmess(frame1).png');
       game.load.image('pot_fall', 'Image/scene1/plantfall(frame1).png');
 
+      game.load.spritesheet('pot_plant', 'Image/scene1/plantwilt spritesheet.png', 160, 90);
+      game.load.spritesheet('pot_blood', 'Image/scene1/plantblood spritesheet.png', 160, 90);
       game.load.spritesheet('pot_pot', 'Image/scene1/potbreaking spritesheet.png', 160, 90);
       game.load.spritesheet('pot_rootleft', 'Image/scene1/rootleft spritesheet.png', 160, 90);
       game.load.spritesheet('pot_rootright', 'Image/scene1/rootright spritesheet.png', 160, 90);
@@ -99,6 +101,7 @@ export default function(game: Phaser.Game) {
       musics.push(game.sound.play('music3', 0, true));
       musics.push(game.sound.play('music4', 0, true));
       musics.push(game.sound.play('music5', 0, true));
+      musics.push(game.sound.play('music6', 0, true));
 
       game.state.start('menu', true, false, musics);
     }

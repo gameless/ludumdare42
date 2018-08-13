@@ -36,9 +36,23 @@ export default function(game: Phaser.Game) {
       hl = game.make.bitmapData(160, 90);
       hl_image = game.add.image(0, 0, hl);
 
+      const plant = game.add.sprite(0, 0, 'pot_plant');
+      const blood = game.add.sprite(0, 0, 'pot_blood');
+
+      blood.animations.add('spread');
+      blood.animations.play('spread', 0.5);
+      const wiltTimer = game.time.create();
+      wiltTimer.add(16000, () => {
+        musics[1].fadeTo(8000, 0);
+        musics[6].fadeTo(8000, 1);
+
+        plant.animations.add('wilt');
+        plant.animations.play('wilt', 0.25);
+      });
+      wiltTimer.start();
+
       pot = game.add.sprite(0, 0, 'pot_pot');
       const pot_hl = game.add.image(0, 0, 'pot_pot_hl');
-      const plant = game.add.image(0, 0, 'pot_plant');
 
       hover = new Phaser.Signal();
       hover.add(function() {
