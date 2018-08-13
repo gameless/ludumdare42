@@ -1,15 +1,17 @@
-export default function(game: Phaser.Game) {
-  return {
-    create() {
-      const credits = 'Art: Laura Estep\nCode: Sam Estep\nSound: Ezra LaFleur';
-      const style = { font: '16px sans', fill: '#ffffff' };
-      const text = game.add.text(0, 0, credits, style);
-      text.alpha = 0;
-      const fadeInTimer = game.time.create();
-      fadeInTimer.add(1000, () => {
-        game.add.tween(text).to({ alpha: 1 }, 2000).start();
-      });
-      fadeInTimer.start();
-    }
-  };
-};
+import { MusicalState, startState } from '../music';
+import { escapeCode } from '../pause';
+
+export default class extends MusicalState {
+  create() {
+    this.game.input.keyboard.removeCallbacks();
+
+    const text = this.game.add.image(0, 0, 'credits');
+    this.game.add.tween(text).from({ alpha: 0 }, 2000).delay(1000).start();
+
+    this.game.input.keyboard.addCallbacks(this, (event: KeyboardEvent) => {
+      if (event.keyCode === escapeCode) {
+        startState(this.game, 'menu', this.music, 'pot');
+      }
+    });
+  }
+}

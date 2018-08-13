@@ -1,35 +1,23 @@
-export default function(game: Phaser.Game) {
-  let musics: Phaser.Sound[];
+import { delay } from '../delay';
+import { MusicalState, startState } from '../music';
 
-  return {
-    init(theMusics: Phaser.Sound[]) {
-      musics = theMusics;
-    },
+export default class extends MusicalState {
+  create() {
+    this.game.input.keyboard.removeCallbacks();
 
-    create() {
-      musics[0].fadeTo(500, 0);
-      musics[1].fadeTo(500, 0);
-      musics[2].fadeTo(500, 0);
-      musics[3].fadeTo(500, 0);
-      musics[4].fadeTo(500, 0);
-      musics[5].fadeTo(500, 0);
-      game.sound.play('end');
+    this.music.setTrack('end');
+    this.music.play(false);
 
-      const dieTimer = game.time.create();
-      dieTimer.add(18000, () => {
-        game.state.start('credits');
-      });
-      dieTimer.start();
+    delay(this.game, 18000, () => startState(this.game, 'credits', this.music));
 
-      const planet = game.add.sprite(0, 0, 'planet');
-      planet.animations.add('die');
-      planet.animations.play('die', 0.25);
+    const planet = this.game.add.sprite(0, 0, 'planet_animation');
+    planet.animations.add('die');
+    planet.animations.play('die', 0.25);
 
-      const darken = game.add.graphics();
-      darken.beginFill(0x000000);
-      darken.drawRect(0, 0, 160, 90);
-      darken.endFill();
-      game.add.tween(darken).to({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
-    }
-  };
-};
+    const darken = this.game.add.graphics();
+    darken.beginFill(0x000000);
+    darken.drawRect(0, 0, 160, 90);
+    darken.endFill();
+    this.game.add.tween(darken).to({ alpha: 0 }, 1000).start();
+  }
+}

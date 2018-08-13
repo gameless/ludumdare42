@@ -1,8 +1,10 @@
 Art Needed
 ==========
 
-Pot
----
+Menu
+----
+
+- separate images for the "Resume" and "Restart" buttons
 
 Room
 ----
@@ -15,5 +17,7 @@ Room
     place them in the scene
 - one or two spritesheets for the vines the player can grow
 
-Planet
+Island
 ------
+
+...

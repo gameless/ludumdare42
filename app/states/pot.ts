@@ -1,215 +1,232 @@
-export default function(game: Phaser.Game) {
-  let musics: Phaser.Sound[];
-  let rootLeft: Phaser.Sprite;
-  let rootRight: Phaser.Sprite;
-  let pot: Phaser.Sprite;
-  let fade: Phaser.Tween;
-  let hover: Phaser.Signal;
-  let hl: Phaser.BitmapData;
-  let hl_image: Phaser.Image;
+import * as _ from 'lodash';
 
-  let hovering = false;
-  let showCross = true;
-  let shattered = false;
+import { delay } from '../delay';
+import { fadeIn, fadeOut } from '../fade';
+import { Highlight } from '../highlight';
+import { escapeCode } from '../pause';
+import { Music, MusicalState, startState } from '../music';
 
-  let leftGrowth = 0;
-  let rightGrowth = 0;
+const closeToPot = new Phaser.Polygon([
+  [37, 44],
+  [50, 81],
+  [67, 86],
+  [89, 86],
+  [105, 80],
+  [114, 44],
+  [100, 33],
+  [50, 33]
+].map(([x, y]) => new Phaser.Point(x, y)));
 
-  return {
-    init(theMusics: Phaser.Sound[]) {
-      musics = theMusics;
-    },
+const backshardDeltas = [
+  [-16, -15], [1, -20], [15, -20], [-14, 3], [3, -7], [30, -1]
+];
 
-    create() {
-      musics[0].fadeTo(500, 0);
-      musics[1].fadeTo(500, 1);
+const frontshardDeltas = [
+  [-29, -5], [-2, -3], [14, -8], [23, -14], [-20, 3], [15, 2]
+];
 
-      game.add.image(0, 0, 'pot_bg');
-      game.add.image(0, 0, 'pot_shelf');
-      game.add.image(0, 0, 'pot_shelf_hl');
-      const potCross = game.add.image(0, 0, 'pot_cross');
+export default class extends MusicalState {
+  startFade = false;
 
-      const root = game.add.image(0, 0, 'pot_root');
-      rootLeft = game.add.sprite(0, 0, 'pot_rootleft');
-      rootRight = game.add.sprite(0, 0, 'pot_rootright');
+  // @ts-ignore
+  highlight: Highlight;
 
-      hl = game.make.bitmapData(160, 90);
-      hl_image = game.add.image(0, 0, hl);
+  init(music: Music, startFade: boolean) {
+    super.init(music);
+    this.startFade = startFade;
+  }
 
-      const plant = game.add.sprite(0, 0, 'pot_plant');
-      const blood = game.add.sprite(0, 0, 'pot_blood');
+  startBlood(plant: Phaser.Sprite, blood: Phaser.Sprite) {
+    let shattered = false;
+    blood.animations.add('spread');
+    blood.animations.play('spread', 0.5);
+    delay(this.game, 16000, () => {
+      this.music.fadeBadness(8000, 1);
+      if (!shattered) {
+        plant.animations.add('wilt').play(0.25);
+        delay(this.game, 8000, () => {
+          if (!shattered) {
+            fadeOut(this.game, 1000);
+            delay(this.game, 1000, () => {
+              this.highlight.destroy();
+              startState(this.game, 'pot', this.music, true);
+            });
+          }
+        });
+      }
+    });
+    return () => shattered = true;
+  }
 
-      blood.animations.add('spread');
-      blood.animations.play('spread', 0.5);
-      const wiltTimer = game.time.create();
-      wiltTimer.add(16000, () => {
-        musics[1].fadeTo(8000, 0);
-        musics[5].fadeTo(8000, 1);
-
-        if (!shattered) {
-          plant.animations.add('wilt');
-          plant.animations.play('wilt', 0.25);
-        }
-      });
-      wiltTimer.start();
-
-      pot = game.add.sprite(0, 0, 'pot_pot');
-      const pot_hl = game.add.image(0, 0, 'pot_pot_hl');
-
-      hover = new Phaser.Signal();
-      hover.add(function() {
-        const newAlpha = (hovering && showCross) ? 0 : 1;
+  startCross(pot: Phaser.Sprite) {
+    let fade: Phaser.Tween;
+    let braced = false;
+    let hovering = false;
+    this.game.input.addMoveCallback(() => {
+      const x = this.game.input.x;
+      const y = this.game.input.y;
+      const nowHovering = closeToPot.contains(x, y);
+      if (!braced && nowHovering !== hovering) {
+        hovering = nowHovering;
+        const newAlpha = hovering ? 0 : 1;
         const time = Math.abs(newAlpha - pot.alpha) * 250;
         if (fade) {
           fade.stop();
         }
-        fade = game.add.tween(pot);
-        fade.to({ alpha: newAlpha }, time, Phaser.Easing.Default, true);
-      });
+        fade = this.game.add.tween(pot);
+        fade.to({ alpha: newAlpha }, time).start();
+      }
+    }, this);
+    return () => {
+      braced = true;
+      fade.to({ alpha: 1 }, (1 - pot.alpha) * 250).start();
+    };
+  }
 
-      game.input.onDown.add(function() {
-        if (hovering) {
-          if (showCross) {
-            if (game.input.x < 80 && leftGrowth < 4) {
-              leftGrowth++;
-              game.sound.play('root' + (leftGrowth + rightGrowth));
-              rootLeft.frame = leftGrowth;
+  create() {
+    this.game.input.keyboard.removeCallbacks();
+
+    this.music.fadeTrack(500, 'fun1');
+    this.music.fadeBadness(500, 0);
+
+    this.game.add.image(0, 0, 'pot_bg');
+    this.game.add.image(0, 0, 'pot_shelf');
+    this.game.add.image(0, 0, 'pot_shelf_hl');
+    const potCross = this.game.add.image(0, 0, 'pot_cross');
+    const root = this.game.add.image(0, 0, 'pot_root');
+    const rootLeft = this.game.add.sprite(0, 0, 'pot_rootleft');
+    const rootRight = this.game.add.sprite(0, 0, 'pot_rootright');
+    const plant = this.game.add.sprite(0, 0, 'pot_plant');
+    const blood = this.game.add.sprite(0, 0, 'pot_blood');
+    const pot = this.game.add.sprite(0, 0, 'pot_pot');
+    const pot_hl = this.game.add.image(0, 0, 'pot_pot_hl');
+
+    this.game.input.keyboard.addCallbacks(this, (event: KeyboardEvent) => {
+      if (event.keyCode === escapeCode) {
+        this.highlight.destroy();
+        startState(this.game, 'menu', this.music, 'pot');
+      }
+    });
+
+    let leftGrowth = 0;
+    let rightGrowth = 0;
+    let braced = false;
+    let shattered = false;
+
+    this.highlight = new Highlight(this.game, (x, y) => {
+      if (!braced) {
+        if (closeToPot.contains(x, y)) {
+          if (x < 80) {
+            if (leftGrowth < 4) {
+              return rootLeft;
             }
-
-            if (game.input.x >= 80 && rightGrowth < 3) {
-              rightGrowth++;
-              game.sound.play('root' + (leftGrowth + rightGrowth));
-              rootRight.frame = rightGrowth;
+          } else {
+            if (rightGrowth < 3) {
+              return rootRight
             }
-
-            if (leftGrowth === 4 && rightGrowth === 3) {
-              musics[1].fadeTo(500, 0);
-              musics[2].fadeTo(500, 1);
-
-              pot_hl.destroy();
-              hl_image.destroy();
-              game.add.image(0, 0, hl);
-              rootRight.frame = rightGrowth + 1;
-              pot.frame = 1;
-              showCross = false;
-              hover.dispatch();
-            }
-          } else if (!shattered) {
-            shattered = true;
-
-            game.sound.play('shatter');
-
-            potCross.destroy();
-            root.destroy();
-            rootLeft.destroy();
-            rootRight.destroy();
-            plant.destroy();
-            blood.destroy();
-            pot.destroy();
-            hl_image.destroy();
-
-            const shatterTime = 375;
-            const easing = Phaser.Easing.Sinusoidal.InOut;
-
-            const backshards: Phaser.Image[] = [];
-            backshards.push(game.add.image(0, 0, 'pot_backshard1'));
-            backshards.push(game.add.image(0, 0, 'pot_backshard2'));
-            backshards.push(game.add.image(0, 0, 'pot_backshard3'));
-            backshards.push(game.add.image(0, 0, 'pot_backshard4'));
-            backshards.push(game.add.image(0, 0, 'pot_backshard5'));
-            backshards.push(game.add.image(0, 0, 'pot_backshard6'));
-
-            const float = game.add.image(0, 0, 'pot_float');
-
-            const frontshards: Phaser.Image[] = [];
-            frontshards.push(game.add.image(0, 0, 'pot_frontshard1'));
-            frontshards.push(game.add.image(0, 0, 'pot_frontshard2'));
-            frontshards.push(game.add.image(0, 0, 'pot_frontshard3'));
-            frontshards.push(game.add.image(0, 0, 'pot_frontshard4'));
-            frontshards.push(game.add.image(0, 0, 'pot_frontshard5'));
-            frontshards.push(game.add.image(0, 0, 'pot_frontshard6'));
-
-            game.add.tween(backshards[0]).to({ x: -16, y: -15 }, shatterTime, easing, true);
-            game.add.tween(backshards[1]).to({ x: 1, y: -20 }, shatterTime, easing, true);
-            game.add.tween(backshards[2]).to({ x: 15, y: -20 }, shatterTime, easing, true);
-            game.add.tween(backshards[3]).to({ x: -14, y: 3 }, shatterTime, easing, true);
-            game.add.tween(backshards[4]).to({ x: 3, y: -7 }, shatterTime, easing, true);
-            game.add.tween(backshards[5]).to({ x: 30, y: -1 }, shatterTime, easing, true);
-            game.add.tween(frontshards[0]).to({ x: -29, y: -5 }, shatterTime, easing, true);
-            game.add.tween(frontshards[1]).to({ x: -2, y: -3 }, shatterTime, easing, true);
-            game.add.tween(frontshards[2]).to({ x: 14, y: -8 }, shatterTime, easing, true);
-            game.add.tween(frontshards[3]).to({ x: 23, y: -14 }, shatterTime, easing, true);
-            game.add.tween(frontshards[4]).to({ x: -20, y: 3 }, shatterTime, easing, true);
-            game.add.tween(frontshards[5]).to({ x: 15, y: 2 }, shatterTime, easing, true);
-
-            const timer = game.time.create();
-            timer.add(shatterTime, () => {
-              backshards.forEach(shard => shard.destroy());
-              float.destroy();
-              frontshards.forEach(shard => shard.destroy());
-
-              const fall = game.add.image(0, 0, 'pot_fall');
-              game.add.tween(fall).to({ y: 50 }, 1000, Phaser.Easing.Quadratic.In, true);
-              game.add.image(0, 0, 'pot_mess');
-
-              const darken = game.add.graphics();
-              darken.beginFill(0x000000);
-              darken.drawRect(0, 0, 160, 90);
-              darken.endFill();
-              game.add.tween(darken).from({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
-
-              game.camera.flash(0xffffff, 500);
-
-              const innerTimer = game.time.create();
-              innerTimer.add(1000, () => {
-                hl.destroy();
-                game.state.start('room', true, false, musics);
-              });
-              innerTimer.start();
-            });
-            timer.start();
           }
         }
-      });
-    },
-
-    update() {
-      const closeToPot = new Phaser.Polygon([
-        [37, 44],
-        [50, 81],
-        [67, 86],
-        [89, 86],
-        [105, 80],
-        [114, 44],
-        [100, 33],
-        [50, 33]
-      ].map(([x, y]) => new Phaser.Point(x, y)));
-
-      const hoveringNow = closeToPot.contains(game.input.x, game.input.y);
-      if (hoveringNow !== hovering) {
-        hovering = hoveringNow;
-        hover.dispatch();
+      } else if (!shattered) {
+        return pot;
       }
-    },
+      return null;
+    });
 
-    render() {
-      hl.clear();
-      hl.blendSourceOver();
-      const alpha = game.input.activePointer.isDown ? 0.75 : 0.5;
-      hl.fill(0xff, 0xff, 0xff, alpha);
-      hl.blendDestinationIn();
-      hl.circle(game.input.x, game.input.y, 10);
-      if (showCross) {
-        if (game.input.x < 80 && leftGrowth < 4) {
-          hl.draw(rootLeft);
-        } else if (game.input.x >= 80 && rightGrowth < 3) {
-          hl.draw(rootRight);
-        } else {
-          hl.clear();
-        }
-      } else {
-        hl.draw(pot);
-      }
+    if (this.startFade) {
+      fadeIn(this.game, 1000);
     }
-  };
-};
+
+    const stopBlood = this.startBlood(plant, blood);
+    const stopCross = this.startCross(pot);
+
+    this.game.input.onUp.add(() => {
+      if (closeToPot.contains(this.game.input.x, this.game.input.y)) {
+        if (!braced) {
+          let grew = false;
+          if (this.game.input.x < 80) {
+            if (leftGrowth < 4) {
+              leftGrowth++;
+              rootLeft.frame = leftGrowth;
+              grew = true;
+            }
+          } else {
+            if (rightGrowth < 3) {
+              rightGrowth++;
+              rootRight.frame = rightGrowth;
+              grew = true;
+            }
+          }
+          if (grew) {
+            this.game.sound.play('effect_root' + (leftGrowth + rightGrowth));
+          }
+
+          if (leftGrowth === 4 && rightGrowth === 3) {
+            braced = true;
+            stopCross();
+            this.music.fadeTrack(500, 'fun2');
+            pot_hl.destroy();
+            rootRight.frame = rightGrowth + 1;
+            pot.frame = 1;
+          }
+        } else if (!shattered) {
+          shattered = true;
+          stopBlood();
+
+          this.music.fadeBadness(500, 0);
+
+          this.game.sound.play('effect_shatter');
+
+          potCross.destroy();
+          root.destroy();
+          rootLeft.destroy();
+          rootRight.destroy();
+          plant.destroy();
+          blood.destroy();
+          pot.destroy();
+
+          const shatterTime = 375;
+          const easing = Phaser.Easing.Sinusoidal.InOut;
+
+          const backshards = _.range(1, 7).map(i => {
+            const shard = this.game.add.image(0, 0, 'pot_backshard' + i);
+            const [x, y] = backshardDeltas[i - 1];
+            const tween = this.game.add.tween(shard);
+            tween.to({ x: x, y: y }, shatterTime, easing, true);
+            return shard;
+          });
+          const float = this.game.add.image(0, 0, 'pot_float');
+          const frontshards = _.range(1, 7).map(i => {
+            const shard = this.game.add.image(0, 0, 'pot_frontshard' + i);
+            const [x, y] = frontshardDeltas[i - 1];
+            const tween = this.game.add.tween(shard);
+            tween.to({ x: x, y: y }, shatterTime, easing, true);
+            return shard;
+          });
+
+          delay(this.game, shatterTime, () => {
+            backshards.forEach(shard => shard.destroy());
+            float.destroy();
+            frontshards.forEach(shard => shard.destroy());
+
+            const fall = this.game.add.image(0, 0, 'pot_fall');
+            const fallTween = this.game.add.tween(fall)
+            fallTween.to({ y: 50 }, 1000, Phaser.Easing.Quadratic.In, true);
+            this.game.add.image(0, 0, 'pot_mess');
+
+            fadeOut(this.game, 1000);
+            this.game.camera.flash(0xffffff, 500);
+
+            delay(this.game, 1000, () => {
+              this.highlight.destroy();
+              startState(this.game, 'room', this.music, true);
+            });
+          });
+        }
+      }
+    });
+  }
+
+  render() {
+    this.highlight.render();
+  }
+}

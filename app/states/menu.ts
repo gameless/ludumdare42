@@ -1,41 +1,44 @@
-export default function(game: Phaser.Game) {
-  const button = new Phaser.Polygon([
-    [16, 25], [13, 57], [145, 64], [145, 30]
-  ].map(([x, y]) => new Phaser.Point(x, y)));
+import { Highlight } from '../highlight';
+import { Music, MusicalState, startState } from '../music';
 
-  let musics: Phaser.Sound[];
-  let hl: Phaser.BitmapData;
+const button = new Phaser.Polygon([
+  [16, 25], [13, 57], [145, 64], [145, 30]
+].map(([x, y]) => new Phaser.Point(x, y)));
 
-  return {
-    init(theMusics: Phaser.Sound[]) {
-      musics = theMusics;
-    },
+export default class extends MusicalState {
+  // @ts-ignore
+  behind: string;
 
-    create() {
-      game.add.image(0, 0, 'menu_background');
-      game.add.image(0, 0, 'menu_start');
+  // @ts-ignore
+  highlight: Highlight;
 
-      hl = game.make.bitmapData(160, 90);
-      game.add.image(0, 0, hl);
+  init(music: Music, behind: string) {
+    super.init(music);
+    this.behind = behind || 'pot';
+  }
 
-      game.input.onUp.add(() => {
-        if (button.contains(game.input.x, game.input.y)) {
-          hl.destroy();
-          game.state.start('pot', true, false, musics);
-        }
-      });
-    },
+  create() {
+    this.game.input.keyboard.removeCallbacks();
 
-    render() {
-      hl.clear();
-      if (button.contains(game.input.x, game.input.y)) {
-        hl.blendSourceOver();
-        const alpha = game.input.activePointer.isDown ? 0.75 : 0.5;
-        hl.fill(0xff, 0xff, 0xff, alpha);
-        hl.blendDestinationIn();
-        hl.circle(game.input.x, game.input.y, 10);
-        hl.draw('menu_start');
+    this.music.fadeTrack(500, 'title');
+    this.music.play(true);
+
+    this.game.add.image(0, 0, 'menu_background');
+    const buttonSprite = this.game.add.sprite(0, 0, 'menu_start');
+
+    this.highlight = new Highlight(this.game, (x, y) => {
+      return button.contains(x, y) ? buttonSprite : null;
+    });
+
+    this.game.input.onUp.add(() => {
+      if (button.contains(this.game.input.x, this.game.input.y)) {
+        this.highlight.destroy();
+        startState(this.game, this.behind, this.music);
       }
-    }
-  };
-};
+    });
+  }
+
+  render() {
+    this.highlight.render();
+  }
+}
