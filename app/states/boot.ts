@@ -104,6 +104,14 @@ export default function(game: Phaser.Game) {
         return game.cache.isSoundDecoded('music' + n);
       });
       if (ready) {
+        const loadingTag = document.getElementById('loading');
+        if (loadingTag) {
+          const parent = loadingTag.parentNode;
+          if (parent) {
+            parent.removeChild(loadingTag);
+          }
+        }
+
         const musics: Phaser.Sound[] = [];
         musics.push(game.sound.play('music0', 1, true));
         musics.push(game.sound.play('music1', 0, true));
