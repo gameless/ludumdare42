@@ -1,3 +1,4 @@
+import { delay } from '../delay';
 import { Highlight } from '../highlight';
 import { Music, startState } from '../music';
 
@@ -113,12 +114,10 @@ export default function(game: Phaser.Game) {
 
         game.sound.play('effect_bean', 3);
 
-        const beanTimer = game.time.create();
-        beanTimer.add(250, () => {
+        delay(game, 250, () => {
           beanLeft.frame = 1;
           beanRight.frame = 1;
         });
-        beanTimer.start();
         otherBeans.animations.add('shrink').play(8);
 
         const baseTween = game.add.tween(toolbar);
@@ -148,12 +147,10 @@ export default function(game: Phaser.Game) {
                 darken.endFill();
                 game.add.tween(darken).from({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
 
-                const innerTimer = game.time.create();
-                innerTimer.add(1000, () => {
+                delay(game, 1000, () => {
                   highlight.destroy();
                   startState(game, 'planet', music);
                 });
-                innerTimer.start();
               }
             });
           }
@@ -171,8 +168,7 @@ export default function(game: Phaser.Game) {
         });
       }
 
-      const timer = game.time.create();
-      timer.add(1000, () => {
+      delay(game, 1000, () => {
         game.sound.play('effect_thud', 5);
 
         game.input.onDown.add(() => {
@@ -181,21 +177,16 @@ export default function(game: Phaser.Game) {
               choseBean = true;
               plant.animations.add('eat_left', [2, 8, 9, 10, 11, 2]);
               plant.animations.play('eat_left', 2);
-              const innerTimer = game.time.create();
-              innerTimer.add(1000, () => eatBean(false));
-              innerTimer.start();
+              delay(game, 1000, () => eatBean(false));
             } else if (rightBean.contains(game.input.x, game.input.y)) {
               choseBean = true;
               plant.animations.add('eat_right', [2, 3, 4, 5, 6, 7, 2]);
               plant.animations.play('eat_right', 3);
-              const innerTimer = game.time.create();
-              innerTimer.add(1000, () => eatBean(true));
-              innerTimer.start();
+              delay(game, 1000, () => eatBean(true));
             }
           }
         });
       });
-      timer.start();
     },
 
     render() {

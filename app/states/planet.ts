@@ -1,3 +1,4 @@
+import { delay } from '../delay';
 import { MusicalState } from '../music';
 
 export default class extends MusicalState {
@@ -5,9 +6,7 @@ export default class extends MusicalState {
     this.music.setTrack('end');
     this.music.play(false);
 
-    const dieTimer = this.game.time.create();
-    dieTimer.add(18000, () => this.game.state.start('credits'));
-    dieTimer.start();
+    delay(this.game, 18000, () => this.game.state.start('credits'));
 
     const planet = this.game.add.sprite(0, 0, 'planet_animation');
     planet.animations.add('die');

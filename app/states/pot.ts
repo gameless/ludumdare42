@@ -1,3 +1,4 @@
+import { delay } from '../delay';
 import { Highlight } from '../highlight';
 import { MusicalState, startState } from '../music';
 
@@ -32,8 +33,7 @@ export default class extends MusicalState {
 
     blood.animations.add('spread');
     blood.animations.play('spread', 0.5);
-    const wiltTimer = self.game.time.create();
-    wiltTimer.add(16000, () => {
+    delay(self.game, 16000, () => {
       self.music.fadeBadness(8000, 1);
 
       if (!self.shattered) {
@@ -41,7 +41,6 @@ export default class extends MusicalState {
         plant.animations.play('wilt', 0.25);
       }
     });
-    wiltTimer.start();
 
     const pot = self.game.add.sprite(0, 0, 'pot_pot');
     const pot_hl = self.game.add.image(0, 0, 'pot_pot_hl');
@@ -144,8 +143,7 @@ export default class extends MusicalState {
           self.game.add.tween(frontshards[4]).to({ x: -20, y: 3 }, shatterTime, easing, true);
           self.game.add.tween(frontshards[5]).to({ x: 15, y: 2 }, shatterTime, easing, true);
 
-          const timer = self.game.time.create();
-          timer.add(shatterTime, () => {
+          delay(self.game, shatterTime, () => {
             backshards.forEach(shard => shard.destroy());
             float.destroy();
             frontshards.forEach(shard => shard.destroy());
@@ -162,14 +160,11 @@ export default class extends MusicalState {
 
             self.game.camera.flash(0xffffff, 500);
 
-            const innerTimer = self.game.time.create();
-            innerTimer.add(1000, () => {
+            delay(self.game, 1000, () => {
               self.highlight.destroy();
               startState(self.game, 'room', self.music);
             });
-            innerTimer.start();
           });
-          timer.start();
         }
       }
     });
