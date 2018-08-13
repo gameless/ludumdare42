@@ -826,172 +826,181 @@ exports.default = default_1;
 
 require.register("states/room.ts", function(exports, require, module) {
 "use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var delay_1 = require("../delay");
 var fade_1 = require("../fade");
 var highlight_1 = require("../highlight");
 var music_1 = require("../music");
-function default_1(game) {
-    var music;
-    var beanLeft;
-    var beanRight;
-    var highlight;
-    var leftBean = new Phaser.Rectangle(53, 53, 8, 15);
-    var rightBean = new Phaser.Rectangle(73, 53, 8, 15);
-    var choseBean = false;
-    var ateBean = false;
-    var growths = 0;
-    return {
-        init: function (theMusic) {
-            music = theMusic;
-        },
-        create: function () {
-            music.fadeTrack(500, 'fun3');
-            game.add.image(0, 0, 'room_bg');
-            var vines = game.add.sprite(0, 0, 'room_vines');
-            beanLeft = game.add.sprite(0, 0, 'room_beanleft');
-            beanRight = game.add.sprite(0, 0, 'room_beanright');
-            var otherBeans = game.add.sprite(0, 0, 'room_otherbeans');
-            game.add.image(0, 0, 'room_int');
-            var plant = game.add.sprite(0, 0, 'room_plant');
-            game.add.image(0, 0, 'room_pot');
-            highlight = new highlight_1.Highlight(game, function (x, y) {
-                if (!ateBean) {
-                    if (leftBean.contains(x, y)) {
-                        return beanLeft;
-                    }
-                    else if (rightBean.contains(x, y)) {
-                        return beanRight;
-                    }
-                }
-                return null;
+var leftBean = new Phaser.Rectangle(53, 53, 8, 15);
+var rightBean = new Phaser.Rectangle(73, 53, 8, 15);
+var default_1 = (function (_super) {
+    __extends(default_1, _super);
+    function default_1() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    default_1.prototype.setupTool = function (tool, dots, action) {
+        var _this = this;
+        var initialX = tool.x;
+        var initialY = tool.y;
+        tool.inputEnabled = true;
+        tool.input.enableDrag();
+        var sparkles;
+        tool.events.onDragStart.add(function () {
+            sparkles = dots.map(function (_a) {
+                var x = _a[0], y = _a[1];
+                var sparkle = _this.game.add.graphics(x + 0.5, y + 0.5);
+                sparkle.alpha = 0.75;
+                sparkle.beginFill(0xffffff);
+                sparkle.drawPolygon([
+                    [0, -2.5],
+                    [-0.5, -0.5],
+                    [-2.5, 0],
+                    [-0.5, 0.5],
+                    [0, 2.5],
+                    [0.5, 0.5],
+                    [2.5, 0],
+                    [0.5, -0.5]
+                ]);
+                sparkle.endFill();
+                _this.game.add.tween(sparkle.scale).to({ x: 0, y: 0 }, 500, Phaser.Easing.Default, true, 0, -1, true);
+                return sparkle;
             });
-            var toolbar = game.add.image(0, 0, 'room_toolbar');
-            var toolOrig = game.add.image(1, 2, 'room_toolorig');
-            var toolBean = game.add.image(12, 1, 'room_toolbean');
-            var toolVine = game.add.image(22, 3, 'room_toolvine');
-            toolbar.alpha = 0;
-            toolOrig.alpha = 0;
-            toolBean.alpha = 0;
-            toolVine.alpha = 0;
-            function setupTool(tool, dots, action) {
-                var initialX = tool.x;
-                var initialY = tool.y;
-                tool.inputEnabled = true;
-                tool.input.enableDrag();
-                var sparkles;
-                tool.events.onDragStart.add(function () {
-                    sparkles = dots.map(function (_a) {
-                        var x = _a[0], y = _a[1];
-                        var sparkle = game.add.graphics(x + 0.5, y + 0.5);
-                        sparkle.alpha = 0.75;
-                        sparkle.beginFill(0xffffff);
-                        sparkle.drawPolygon([
-                            [0, -2.5],
-                            [-0.5, -0.5],
-                            [-2.5, 0],
-                            [-0.5, 0.5],
-                            [0, 2.5],
-                            [0.5, 0.5],
-                            [2.5, 0],
-                            [0.5, -0.5]
-                        ]);
-                        sparkle.endFill();
-                        game.add.tween(sparkle.scale).to({ x: 0, y: 0 }, 500, Phaser.Easing.Default, true, 0, -1, true);
-                        return sparkle;
-                    });
-                });
-                tool.events.onDragStop.add(function () {
-                    sparkles.forEach(function (sparkle) { return sparkle.destroy(); });
-                    sparkles = [];
-                    action(game.input.x, game.input.y);
-                    tool.x = initialX;
-                    tool.y = initialY;
-                });
-            }
-            fade_1.fadeIn(game, 1000);
-            plant.animations.add('fall', [0, 1, 2]);
-            plant.animations.play('fall', 2);
-            function eatBean(right) {
-                ateBean = true;
-                if (right) {
-                    beanRight.frame = 1;
-                }
-                else {
-                    beanLeft.frame = 1;
-                }
-                game.sound.play('effect_bean', 3);
-                delay_1.delay(game, 250, function () {
-                    beanLeft.frame = 1;
-                    beanRight.frame = 1;
-                });
-                otherBeans.animations.add('shrink').play(8);
-                var baseTween = game.add.tween(toolbar);
-                var origTween = game.add.tween(toolOrig);
-                var beanTween = game.add.tween(toolBean); // lel
-                baseTween.to({ alpha: 1 }, 500);
-                origTween.to({ alpha: 1 }, 500);
-                beanTween.to({ alpha: 1 }, 500);
-                baseTween.chain(origTween, beanTween);
-                baseTween.start();
-                setupTool(toolOrig, [[88, 45]], function (x, y) {
-                    var vine = new Phaser.Rectangle(82, 40, 12, 12);
-                    if (beanRight.frame < 1 && vine.contains(x, y)) {
-                        game.sound.play('effect_snap');
-                        music.fadeTrack(500, 'fun4');
-                        vines.frame = 1;
-                        game.add.tween(toolVine).to({ alpha: 1 }, 500).start();
-                        setupTool(toolVine, [[88, 45]], function (x, y) {
-                            if (vine.contains(x, y)) {
-                                fade_1.fadeOut(game, 1000);
-                                delay_1.delay(game, 1000, function () {
-                                    highlight.destroy();
-                                    music_1.startState(game, 'planet', music);
-                                });
-                            }
+        });
+        tool.events.onDragStop.add(function () {
+            sparkles.forEach(function (sparkle) { return sparkle.destroy(); });
+            sparkles = [];
+            action(_this.game.input.x, _this.game.input.y);
+            tool.x = initialX;
+            tool.y = initialY;
+        });
+    };
+    default_1.prototype.eatBean = function (right) {
+        var _this = this;
+        if (right) {
+            this.beanRight.frame = 1;
+        }
+        else {
+            this.beanLeft.frame = 1;
+        }
+        this.game.sound.play('effect_bean', 3);
+        delay_1.delay(this.game, 250, function () {
+            _this.beanLeft.frame = 1;
+            _this.beanRight.frame = 1;
+        });
+        this.otherBeans.animations.add('shrink').play(8);
+        var baseTween = this.game.add.tween(this.toolbar);
+        var origTween = this.game.add.tween(this.toolOrig);
+        var beanTween = this.game.add.tween(this.toolBean); // lel
+        baseTween.to({ alpha: 1 }, 500);
+        origTween.to({ alpha: 1 }, 500);
+        beanTween.to({ alpha: 1 }, 500);
+        baseTween.chain(origTween, beanTween);
+        baseTween.start();
+        this.setupTool(this.toolOrig, [[88, 45]], function (x, y) {
+            var vine = new Phaser.Rectangle(82, 40, 12, 12);
+            if (_this.beanRight.frame < 1 && vine.contains(x, y)) {
+                _this.game.sound.play('effect_snap');
+                _this.music.fadeTrack(500, 'fun4');
+                _this.vines.frame = 1;
+                _this.game.add.tween(_this.toolVine).to({ alpha: 1 }, 500).start();
+                _this.setupTool(_this.toolVine, [[88, 45]], function (x, y) {
+                    if (vine.contains(x, y)) {
+                        fade_1.fadeOut(_this.game, 1000);
+                        delay_1.delay(_this.game, 1000, function () {
+                            _this.highlight.destroy();
+                            music_1.startState(_this.game, 'planet', _this.music);
                         });
                     }
                 });
-                setupTool(toolBean, [[56, 63], [77, 63]], function (x, y) {
-                    if (leftBean.contains(x, y)) {
-                        growths++;
-                        game.sound.play('effect_grow' + growths);
-                        beanLeft.frame = 0;
-                    }
-                    else if (rightBean.contains(x, y)) {
-                        growths++;
-                        game.sound.play('effect_grow' + growths);
-                        beanRight.frame = 0;
-                    }
-                });
             }
-            delay_1.delay(game, 1000, function () {
-                game.sound.play('effect_thud', 5);
-                game.input.onDown.add(function () {
-                    if (!choseBean) {
-                        if (leftBean.contains(game.input.x, game.input.y)) {
-                            choseBean = true;
-                            plant.animations.add('eat_left', [2, 8, 9, 10, 11, 2]);
-                            plant.animations.play('eat_left', 2);
-                            delay_1.delay(game, 1000, function () { return eatBean(false); });
-                        }
-                        else if (rightBean.contains(game.input.x, game.input.y)) {
-                            choseBean = true;
-                            plant.animations.add('eat_right', [2, 3, 4, 5, 6, 7, 2]);
-                            plant.animations.play('eat_right', 3);
-                            delay_1.delay(game, 1000, function () { return eatBean(true); });
-                        }
-                    }
-                });
-            });
-        },
-        render: function () {
-            highlight.render();
-        }
+        });
+        var growths = 0;
+        this.setupTool(this.toolBean, [[56, 63], [77, 63]], function (x, y) {
+            if (leftBean.contains(x, y)) {
+                growths++;
+                _this.game.sound.play('effect_grow' + growths);
+                _this.beanLeft.frame = 0;
+            }
+            else if (rightBean.contains(x, y)) {
+                growths++;
+                _this.game.sound.play('effect_grow' + growths);
+                _this.beanRight.frame = 0;
+            }
+        });
     };
-}
+    default_1.prototype.create = function () {
+        var _this = this;
+        this.music.fadeTrack(500, 'fun3');
+        this.music.fadeBadness(500, 0);
+        this.game.add.image(0, 0, 'room_bg');
+        this.vines = this.game.add.sprite(0, 0, 'room_vines');
+        this.beanLeft = this.game.add.sprite(0, 0, 'room_beanleft');
+        this.beanRight = this.game.add.sprite(0, 0, 'room_beanright');
+        this.otherBeans = this.game.add.sprite(0, 0, 'room_otherbeans');
+        this.game.add.image(0, 0, 'room_int');
+        var plant = this.game.add.sprite(0, 0, 'room_plant');
+        this.game.add.image(0, 0, 'room_pot');
+        this.toolbar = this.game.add.image(0, 0, 'room_toolbar');
+        this.toolOrig = this.game.add.image(1, 2, 'room_toolorig');
+        this.toolBean = this.game.add.image(12, 1, 'room_toolbean');
+        this.toolVine = this.game.add.image(22, 3, 'room_toolvine');
+        this.toolbar.alpha = 0;
+        this.toolOrig.alpha = 0;
+        this.toolBean.alpha = 0;
+        this.toolVine.alpha = 0;
+        var choseBean = false;
+        var ateBean = false;
+        this.highlight = new highlight_1.Highlight(this.game, function (x, y) {
+            if (!ateBean) {
+                if (leftBean.contains(x, y)) {
+                    return _this.beanLeft;
+                }
+                else if (rightBean.contains(x, y)) {
+                    return _this.beanRight;
+                }
+            }
+            return null;
+        });
+        fade_1.fadeIn(this.game, 1000);
+        plant.animations.add('fall', [0, 1, 2]);
+        plant.animations.play('fall', 2);
+        delay_1.delay(this.game, 1000, function () {
+            _this.game.sound.play('effect_thud', 5);
+            _this.game.input.onDown.add(function () {
+                if (!choseBean) {
+                    if (leftBean.contains(_this.game.input.x, _this.game.input.y)) {
+                        choseBean = true;
+                        plant.animations.add('eat_left', [2, 8, 9, 10, 11, 2]);
+                        plant.animations.play('eat_left', 2);
+                        delay_1.delay(_this.game, 1000, function () {
+                            ateBean = true;
+                            _this.eatBean(false);
+                        });
+                    }
+                    else if (rightBean.contains(_this.game.input.x, _this.game.input.y)) {
+                        choseBean = true;
+                        plant.animations.add('eat_right', [2, 3, 4, 5, 6, 7, 2]);
+                        plant.animations.play('eat_right', 3);
+                        delay_1.delay(_this.game, 1000, function () {
+                            ateBean = true;
+                            _this.eatBean(true);
+                        });
+                    }
+                }
+            });
+        });
+    };
+    default_1.prototype.render = function () {
+        this.highlight.render();
+    };
+    return default_1;
+}(music_1.MusicalState));
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
-;
 
 
 });
