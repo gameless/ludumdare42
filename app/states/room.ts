@@ -1,3 +1,5 @@
+import * as _ from 'lodash';
+
 import { delay } from '../delay';
 import { fadeIn, fadeOut } from '../fade';
 import { Highlight } from '../highlight';
@@ -36,7 +38,7 @@ export default class extends MusicalState {
 
   setupTool(
     tool: Phaser.Image,
-    dots: [number, number][],
+    dots: () => [number, number][],
     action: (x: number, y: number) => void
   ) {
     const initialX = tool.x;
@@ -48,7 +50,7 @@ export default class extends MusicalState {
     let sparkles: Phaser.Graphics[];
 
     tool.events.onDragStart.add(() => {
-      sparkles = dots.map(([x, y]) => {
+      sparkles = dots().map(([x, y]) => {
         const sparkle = this.game.add.graphics(x + 0.5, y + 0.5);
         sparkle.alpha = 0.75;
         sparkle.beginFill(0xffffff);
@@ -103,7 +105,13 @@ export default class extends MusicalState {
     baseTween.chain(origTween, beanTween);
     baseTween.start();
 
-    this.setupTool(this.toolOrig, [[88, 45]], (x, y) => {
+    this.setupTool(this.toolOrig, () => {
+      if (this.vines.frame < 1 && this.beanRight.frame < 1) {
+        return [[88, 45]];
+      } else {
+        return [];
+      }
+    }, (x, y) => {
       const vine = new Phaser.Rectangle(82, 40, 12, 12);
       if (this.beanRight.frame < 1 && vine.contains(x, y)) {
         this.game.sound.play('effect_snap');
@@ -113,7 +121,7 @@ export default class extends MusicalState {
         this.vines.frame = 1;
 
         this.game.add.tween(this.toolVine).to({ alpha: 1 }, 500).start();
-        this.setupTool(this.toolVine, [[88, 45]], (x, y) => {
+        this.setupTool(this.toolVine, () => [[88, 45]], (x, y) => {
           if (vine.contains(x, y)) {
             fadeOut(this.game, 1000);
 
@@ -126,16 +134,18 @@ export default class extends MusicalState {
       }
     });
 
-    let growths = 0;
-
-    this.setupTool(this.toolBean, [[56, 63], [77, 63]], (x, y) => {
+    this.setupTool(this.toolBean, () => {
+      const left: [number, number][]
+        = this.beanLeft.frame > 0 ? [[56, 63]] : [];
+      const right: [number, number][]
+        = this.beanRight.frame > 0 ? [[77, 63]] : [];
+      return left.concat(right);
+    }, (x, y) => {
       if (leftBean.contains(x, y)) {
-        growths++;
-        this.game.sound.play('effect_grow' + growths);
+        this.game.sound.play('effect_grow' + _.sample(_.range(1, 7)));
         this.beanLeft.frame = 0;
       } else if (rightBean.contains(x, y)) {
-        growths++;
-        this.game.sound.play('effect_grow' + growths);
+        this.game.sound.play('effect_grow' + _.sample(_.range(1, 7)));
         this.beanRight.frame = 0;
       }
     });
