@@ -957,6 +957,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var _ = require("lodash");
 var delay_1 = require("../delay");
 var fade_1 = require("../fade");
 var highlight_1 = require("../highlight");
@@ -983,7 +984,7 @@ var default_1 = (function (_super) {
         tool.input.enableDrag();
         var sparkles;
         tool.events.onDragStart.add(function () {
-            sparkles = dots.map(function (_a) {
+            sparkles = dots().map(function (_a) {
                 var x = _a[0], y = _a[1];
                 var sparkle = _this.game.add.graphics(x + 0.5, y + 0.5);
                 sparkle.alpha = 0.75;
@@ -1033,14 +1034,21 @@ var default_1 = (function (_super) {
         beanTween.to({ alpha: 1 }, 500);
         baseTween.chain(origTween, beanTween);
         baseTween.start();
-        this.setupTool(this.toolOrig, [[88, 45]], function (x, y) {
+        this.setupTool(this.toolOrig, function () {
+            if (_this.vines.frame < 1 && _this.beanRight.frame < 1) {
+                return [[88, 45]];
+            }
+            else {
+                return [];
+            }
+        }, function (x, y) {
             var vine = new Phaser.Rectangle(82, 40, 12, 12);
             if (_this.beanRight.frame < 1 && vine.contains(x, y)) {
                 _this.game.sound.play('effect_snap');
                 _this.music.fadeTrack(500, 'fun4');
                 _this.vines.frame = 1;
                 _this.game.add.tween(_this.toolVine).to({ alpha: 1 }, 500).start();
-                _this.setupTool(_this.toolVine, [[88, 45]], function (x, y) {
+                _this.setupTool(_this.toolVine, function () { return [[88, 45]]; }, function (x, y) {
                     if (vine.contains(x, y)) {
                         fade_1.fadeOut(_this.game, 1000);
                         delay_1.delay(_this.game, 1000, function () {
@@ -1051,16 +1059,17 @@ var default_1 = (function (_super) {
                 });
             }
         });
-        var growths = 0;
-        this.setupTool(this.toolBean, [[56, 63], [77, 63]], function (x, y) {
+        this.setupTool(this.toolBean, function () {
+            var left = _this.beanLeft.frame > 0 ? [[56, 63]] : [];
+            var right = _this.beanRight.frame > 0 ? [[77, 63]] : [];
+            return left.concat(right);
+        }, function (x, y) {
             if (leftBean.contains(x, y)) {
-                growths++;
-                _this.game.sound.play('effect_grow' + growths);
+                _this.game.sound.play('effect_grow' + _.sample(_.range(1, 7)));
                 _this.beanLeft.frame = 0;
             }
             else if (rightBean.contains(x, y)) {
-                growths++;
-                _this.game.sound.play('effect_grow' + growths);
+                _this.game.sound.play('effect_grow' + _.sample(_.range(1, 7)));
                 _this.beanRight.frame = 0;
             }
         });
