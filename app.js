@@ -239,7 +239,6 @@ function default_1(game) {
             game.load.image('room_bg', 'Image/scene2/background2.png');
             game.load.image('room_int', 'Image/scene2/wallinterior.png');
             game.load.image('room_pot', 'Image/scene2/brokenpotshards.png');
-            game.load.image('room_ext', 'Image/scene2/wallexterior.png');
             game.load.spritesheet('room_vines', 'Image/scene2/vine spritesheet.png', 160, 90);
             game.load.spritesheet('room_beanleft', 'Image/scene2/beanleft spritesheet.png', 160, 90);
             game.load.spritesheet('room_beanright', 'Image/scene2/beanright spritesheet.png', 160, 90);
@@ -591,10 +590,12 @@ require.register("states/room.ts", function(exports, require, module) {
 "use strict";
 function default_1(game) {
     var musics;
-    var wall;
-    var fade;
-    var hover;
-    var hovering = true;
+    var beanLeft;
+    var beanRight;
+    var hl;
+    var leftBean = new Phaser.Rectangle(53, 53, 8, 15);
+    var rightBean = new Phaser.Rectangle(73, 53, 8, 15);
+    var choseBean = false;
     var ateBean = false;
     var growths = 0;
     return {
@@ -610,14 +611,14 @@ function default_1(game) {
             musics[5].fadeTo(500, 0);
             game.add.image(0, 0, 'room_bg');
             var vines = game.add.sprite(0, 0, 'room_vines');
-            var beanLeft = game.add.sprite(0, 0, 'room_beanleft');
-            var beanRight = game.add.sprite(0, 0, 'room_beanright');
+            beanLeft = game.add.sprite(0, 0, 'room_beanleft');
+            beanRight = game.add.sprite(0, 0, 'room_beanright');
             var otherBeans = game.add.sprite(0, 0, 'room_otherbeans');
             game.add.image(0, 0, 'room_int');
             var plant = game.add.sprite(0, 0, 'room_plant');
             game.add.image(0, 0, 'room_pot');
-            wall = game.add.image(0, 0, 'room_ext');
-            wall.alpha = 0;
+            hl = game.make.bitmapData(160, 90);
+            game.add.image(0, 0, hl);
             var toolbar = game.add.image(0, 0, 'toolbar');
             var toolOrig = game.add.image(1, 2, 'toolbar_orig');
             var toolBean = game.add.image(12, 1, 'toolbar_bean');
@@ -626,12 +627,36 @@ function default_1(game) {
             toolOrig.alpha = 0;
             toolBean.alpha = 0;
             toolVine.alpha = 0;
-            function setupTool(tool, action) {
+            function setupTool(tool, dots, action) {
                 var initialX = tool.x;
                 var initialY = tool.y;
                 tool.inputEnabled = true;
                 tool.input.enableDrag();
+                var sparkles;
+                tool.events.onDragStart.add(function () {
+                    sparkles = dots.map(function (_a) {
+                        var x = _a[0], y = _a[1];
+                        var sparkle = game.add.graphics(x + 0.5, y + 0.5);
+                        sparkle.alpha = 0.75;
+                        sparkle.beginFill(0xffffff);
+                        sparkle.drawPolygon([
+                            [0, -2.5],
+                            [-0.5, -0.5],
+                            [-2.5, 0],
+                            [-0.5, 0.5],
+                            [0, 2.5],
+                            [0.5, 0.5],
+                            [2.5, 0],
+                            [0.5, -0.5]
+                        ]);
+                        sparkle.endFill();
+                        game.add.tween(sparkle.scale).to({ x: 0, y: 0 }, 500, Phaser.Easing.Default, true, 0, -1, true);
+                        return sparkle;
+                    });
+                });
                 tool.events.onDragStop.add(function () {
+                    sparkles.forEach(function (sparkle) { return sparkle.destroy(); });
+                    sparkles = [];
                     action(game.input.x, game.input.y);
                     tool.x = initialX;
                     tool.y = initialY;
@@ -642,103 +667,116 @@ function default_1(game) {
             darken.drawRect(0, 0, 160, 90);
             darken.endFill();
             game.add.tween(darken).to({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
-            plant.animations.add('fall');
+            plant.animations.add('fall', [0, 1, 2]);
             plant.animations.play('fall', 2);
-            hover = new Phaser.Signal();
+            function eatBean(right) {
+                ateBean = true;
+                if (right) {
+                    beanRight.frame = 1;
+                }
+                else {
+                    beanLeft.frame = 1;
+                }
+                game.sound.play('bean', 3);
+                var beanTimer = game.time.create();
+                beanTimer.add(250, function () {
+                    beanLeft.frame = 1;
+                    beanRight.frame = 1;
+                });
+                beanTimer.start();
+                otherBeans.animations.add('shrink').play(8);
+                var baseTween = game.add.tween(toolbar);
+                var origTween = game.add.tween(toolOrig);
+                var beanTween = game.add.tween(toolBean); // lel
+                baseTween.to({ alpha: 1 }, 500);
+                origTween.to({ alpha: 1 }, 500);
+                beanTween.to({ alpha: 1 }, 500);
+                baseTween.chain(origTween, beanTween);
+                baseTween.start();
+                setupTool(toolOrig, [[88, 45]], function (x, y) {
+                    var vine = new Phaser.Rectangle(82, 40, 12, 12);
+                    if (beanRight.frame < 1 && vine.contains(x, y)) {
+                        game.sound.play('snap');
+                        musics[3].fadeTo(500, 0);
+                        musics[4].fadeTo(500, 1);
+                        vines.frame = 1;
+                        game.add.tween(toolVine).to({ alpha: 1 }, 500).start();
+                        setupTool(toolVine, [[88, 45]], function (x, y) {
+                            if (vine.contains(x, y)) {
+                                var darken_1 = game.add.graphics();
+                                darken_1.beginFill(0x000000);
+                                darken_1.drawRect(0, 0, 160, 90);
+                                darken_1.endFill();
+                                game.add.tween(darken_1).from({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
+                                var innerTimer = game.time.create();
+                                innerTimer.add(1000, function () {
+                                    hl.destroy();
+                                    game.state.start('planet', true, false, musics);
+                                });
+                                innerTimer.start();
+                            }
+                        });
+                    }
+                });
+                setupTool(toolBean, [[56, 63], [77, 63]], function (x, y) {
+                    if (leftBean.contains(x, y)) {
+                        growths++;
+                        game.sound.play('grow' + growths);
+                        beanLeft.frame = 0;
+                    }
+                    else if (rightBean.contains(x, y)) {
+                        growths++;
+                        game.sound.play('grow' + growths);
+                        beanRight.frame = 0;
+                    }
+                });
+            }
             var timer = game.time.create();
             timer.add(1000, function () {
                 game.sound.play('thud', 5);
-                hover.add(function () {
-                    var newAlpha = hovering ? 0 : 1;
-                    var time = Math.abs(newAlpha - wall.alpha) * 250;
-                    if (fade) {
-                        fade.stop();
-                    }
-                    fade = game.add.tween(wall);
-                    fade.to({ alpha: newAlpha }, time, Phaser.Easing.Default, true);
-                });
                 game.input.onDown.add(function () {
-                    if (!ateBean) {
-                        var leftBean_1 = new Phaser.Rectangle(53, 53, 8, 15);
-                        var rightBean_1 = new Phaser.Rectangle(73, 53, 8, 15);
-                        if (leftBean_1.contains(game.input.x, game.input.y)) {
-                            ateBean = true;
-                            beanLeft.frame = 1;
+                    if (!choseBean) {
+                        if (leftBean.contains(game.input.x, game.input.y)) {
+                            choseBean = true;
+                            plant.animations.add('eat_left', [2, 8, 9, 10, 11, 2]);
+                            plant.animations.play('eat_left', 2);
+                            var innerTimer = game.time.create();
+                            innerTimer.add(1000, function () { return eatBean(false); });
+                            innerTimer.start();
                         }
-                        else if (rightBean_1.contains(game.input.x, game.input.y)) {
-                            ateBean = true;
-                            beanRight.frame = 1;
-                        }
-                        if (ateBean) {
-                            game.sound.play('bean', 3);
-                            var beanTimer = game.time.create();
-                            beanTimer.add(250, function () {
-                                beanLeft.frame = 1;
-                                beanRight.frame = 1;
-                            });
-                            beanTimer.start();
-                            otherBeans.animations.add('shrink').play(8);
-                            var baseTween = game.add.tween(toolbar);
-                            var origTween = game.add.tween(toolOrig);
-                            var beanTween = game.add.tween(toolBean); // lel
-                            baseTween.to({ alpha: 1 }, 500);
-                            origTween.to({ alpha: 1 }, 500);
-                            beanTween.to({ alpha: 1 }, 500);
-                            baseTween.chain(origTween, beanTween);
-                            baseTween.start();
-                            setupTool(toolOrig, function (x, y) {
-                                var vine = new Phaser.Rectangle(82, 40, 12, 12);
-                                if (beanRight.frame < 1 && vine.contains(x, y)) {
-                                    game.sound.play('snap');
-                                    musics[3].fadeTo(500, 0);
-                                    musics[4].fadeTo(500, 1);
-                                    vines.frame = 1;
-                                    game.add.tween(toolVine).to({ alpha: 1 }, 500).start();
-                                    setupTool(toolVine, function (x, y) {
-                                        if (vine.contains(x, y)) {
-                                            var darken_1 = game.add.graphics();
-                                            darken_1.beginFill(0x000000);
-                                            darken_1.drawRect(0, 0, 160, 90);
-                                            darken_1.endFill();
-                                            game.add.tween(darken_1).from({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
-                                            var innerTimer = game.time.create();
-                                            innerTimer.add(1000, function () { return game.state.start('planet', true, false, musics); });
-                                            innerTimer.start();
-                                        }
-                                    });
-                                }
-                            });
-                            setupTool(toolBean, function (x, y) {
-                                if (leftBean_1.contains(x, y)) {
-                                    growths++;
-                                    game.sound.play('grow' + growths);
-                                    beanLeft.frame = 0;
-                                }
-                                else if (rightBean_1.contains(x, y)) {
-                                    growths++;
-                                    game.sound.play('grow' + growths);
-                                    beanRight.frame = 0;
-                                }
-                            });
+                        else if (rightBean.contains(game.input.x, game.input.y)) {
+                            choseBean = true;
+                            plant.animations.add('eat_right', [2, 3, 4, 5, 6, 7, 2]);
+                            plant.animations.play('eat_right', 3);
+                            var innerTimer = game.time.create();
+                            innerTimer.add(1000, function () { return eatBean(true); });
+                            innerTimer.start();
                         }
                     }
                 });
             });
             timer.start();
         },
-        update: function () {
-            var closeToWall = new Phaser.Polygon([
-                [25, 15], [135, 15], [135, 85], [25, 85]
-            ].map(function (_a) {
-                var x = _a[0], y = _a[1];
-                return new Phaser.Point(x, y);
-            }));
-            var mouseX = game.input.mousePointer.x;
-            var mouseY = game.input.mousePointer.y;
-            var hoveringNow = closeToWall.contains(mouseX, mouseY);
-            if (hoveringNow !== hovering) {
-                hovering = hoveringNow;
-                hover.dispatch();
+        render: function () {
+            hl.clear();
+            hl.blendSourceOver();
+            var alpha = game.input.activePointer.isDown ? 0.75 : 0.5;
+            hl.fill(0xff, 0xff, 0xff, alpha);
+            hl.blendDestinationIn();
+            hl.circle(game.input.x, game.input.y, 10);
+            if (!ateBean) {
+                if (leftBean.contains(game.input.x, game.input.y)) {
+                    hl.draw(beanLeft);
+                }
+                else if (rightBean.contains(game.input.x, game.input.y)) {
+                    hl.draw(beanRight);
+                }
+                else {
+                    hl.clear();
+                }
+            }
+            else {
+                hl.clear();
             }
         }
     };
