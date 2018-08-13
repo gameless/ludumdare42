@@ -1,5 +1,7 @@
+import { Music, startState } from '../music';
+
 export default function(game: Phaser.Game) {
-  let musics: Phaser.Sound[];
+  let music: Music;
   let rootLeft: Phaser.Sprite;
   let rootRight: Phaser.Sprite;
   let pot: Phaser.Sprite;
@@ -16,13 +18,13 @@ export default function(game: Phaser.Game) {
   let rightGrowth = 0;
 
   return {
-    init(theMusics: Phaser.Sound[]) {
-      musics = theMusics;
+    init(theMusic: Music) {
+      music = theMusic;
     },
 
     create() {
-      musics[0].fadeTo(500, 0);
-      musics[1].fadeTo(500, 1);
+      music.tracks['title'].good.fadeTo(500, 0);
+      music.tracks['fun1'].good.fadeTo(500, 1);
 
       game.add.image(0, 0, 'pot_bg');
       game.add.image(0, 0, 'pot_shelf');
@@ -43,8 +45,8 @@ export default function(game: Phaser.Game) {
       blood.animations.play('spread', 0.5);
       const wiltTimer = game.time.create();
       wiltTimer.add(16000, () => {
-        musics[1].fadeTo(8000, 0);
-        musics[5].fadeTo(8000, 1);
+        music.tracks['fun1'].good.fadeTo(8000, 0);
+        music.tracks['fun1'].bad.fadeTo(8000, 1);
 
         if (!shattered) {
           plant.animations.add('wilt');
@@ -72,19 +74,19 @@ export default function(game: Phaser.Game) {
           if (showCross) {
             if (game.input.x < 80 && leftGrowth < 4) {
               leftGrowth++;
-              game.sound.play('root' + (leftGrowth + rightGrowth));
+              game.sound.play('effect_root' + (leftGrowth + rightGrowth));
               rootLeft.frame = leftGrowth;
             }
 
             if (game.input.x >= 80 && rightGrowth < 3) {
               rightGrowth++;
-              game.sound.play('root' + (leftGrowth + rightGrowth));
+              game.sound.play('effect_root' + (leftGrowth + rightGrowth));
               rootRight.frame = rightGrowth;
             }
 
             if (leftGrowth === 4 && rightGrowth === 3) {
-              musics[1].fadeTo(500, 0);
-              musics[2].fadeTo(500, 1);
+              music.tracks['fun1'].good.fadeTo(500, 0);
+              music.tracks['fun2'].good.fadeTo(500, 1);
 
               pot_hl.destroy();
               hl_image.destroy();
@@ -97,7 +99,7 @@ export default function(game: Phaser.Game) {
           } else if (!shattered) {
             shattered = true;
 
-            game.sound.play('shatter');
+            game.sound.play('effect_shatter');
 
             potCross.destroy();
             root.destroy();
@@ -163,7 +165,7 @@ export default function(game: Phaser.Game) {
               const innerTimer = game.time.create();
               innerTimer.add(1000, () => {
                 hl.destroy();
-                game.state.start('room', true, false, musics);
+                startState(game, 'room', music);
               });
               innerTimer.start();
             });

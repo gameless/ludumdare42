@@ -1,19 +1,16 @@
+import { Music } from '../music';
+
 export default function(game: Phaser.Game) {
-  let musics: Phaser.Sound[];
+  let music: Music;
 
   return {
-    init(theMusics: Phaser.Sound[]) {
-      musics = theMusics;
+    init(theMusic: Music) {
+      music = theMusic;
     },
 
     create() {
-      musics[0].fadeTo(500, 0);
-      musics[1].fadeTo(500, 0);
-      musics[2].fadeTo(500, 0);
-      musics[3].fadeTo(500, 0);
-      musics[4].fadeTo(500, 0);
-      musics[5].fadeTo(500, 0);
-      game.sound.play('end');
+      music.tracks['fun4'].good.fadeTo(500, 0);
+      music.tracks['end'].good.play('', 0, 1, false);
 
       const dieTimer = game.time.create();
       dieTimer.add(18000, () => {
@@ -21,7 +18,7 @@ export default function(game: Phaser.Game) {
       });
       dieTimer.start();
 
-      const planet = game.add.sprite(0, 0, 'planet');
+      const planet = game.add.sprite(0, 0, 'planet_animation');
       planet.animations.add('die');
       planet.animations.play('die', 0.25);
 

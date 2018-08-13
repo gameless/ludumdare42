@@ -1,5 +1,7 @@
+import { Music, startState } from '../music';
+
 export default function(game: Phaser.Game) {
-  let musics: Phaser.Sound[];
+  let music: Music;
 
   let beanLeft: Phaser.Sprite;
   let beanRight: Phaser.Sprite;
@@ -13,17 +15,13 @@ export default function(game: Phaser.Game) {
   let growths = 0;
 
   return {
-    init(theMusics: Phaser.Sound[]) {
-      musics = theMusics;
+    init(theMusic: Music) {
+      music = theMusic;
     },
 
     create() {
-      musics[0].fadeTo(500, 0);
-      musics[1].fadeTo(500, 0);
-      musics[2].fadeTo(500, 0);
-      musics[3].fadeTo(500, 1);
-      musics[4].fadeTo(500, 0);
-      musics[5].fadeTo(500, 0);
+      music.tracks['fun2'].good.fadeTo(500, 0);
+      music.tracks['fun3'].good.fadeTo(500, 1);
 
       game.add.image(0, 0, 'room_bg');
       const vines = game.add.sprite(0, 0, 'room_vines');
@@ -37,10 +35,10 @@ export default function(game: Phaser.Game) {
       hl = game.make.bitmapData(160, 90);
       game.add.image(0, 0, hl);
 
-      const toolbar = game.add.image(0, 0, 'toolbar');
-      const toolOrig = game.add.image(1, 2, 'toolbar_orig');
-      const toolBean = game.add.image(12, 1, 'toolbar_bean');
-      const toolVine = game.add.image(22, 3, 'toolbar_vine');
+      const toolbar = game.add.image(0, 0, 'room_toolbar');
+      const toolOrig = game.add.image(1, 2, 'room_toolorig');
+      const toolBean = game.add.image(12, 1, 'room_toolbean');
+      const toolVine = game.add.image(22, 3, 'room_toolvine');
       toolbar.alpha = 0;
       toolOrig.alpha = 0;
       toolBean.alpha = 0;
@@ -105,7 +103,7 @@ export default function(game: Phaser.Game) {
           beanLeft.frame = 1;
         }
 
-        game.sound.play('bean', 3);
+        game.sound.play('effect_bean', 3);
 
         const beanTimer = game.time.create();
         beanTimer.add(250, () => {
@@ -127,10 +125,10 @@ export default function(game: Phaser.Game) {
         setupTool(toolOrig, [[88, 45]], (x, y) => {
           const vine = new Phaser.Rectangle(82, 40, 12, 12);
           if (beanRight.frame < 1 && vine.contains(x, y)) {
-            game.sound.play('snap');
+            game.sound.play('effect_snap');
 
-            musics[3].fadeTo(500, 0);
-            musics[4].fadeTo(500, 1);
+            music.tracks['fun3'].good.fadeTo(500, 0);
+            music.tracks['fun4'].good.fadeTo(500, 1);
 
             vines.frame = 1;
 
@@ -146,7 +144,7 @@ export default function(game: Phaser.Game) {
                 const innerTimer = game.time.create();
                 innerTimer.add(1000, () => {
                   hl.destroy();
-                  game.state.start('planet', true, false, musics);
+                  startState(game, 'planet', music);
                 });
                 innerTimer.start();
               }
@@ -156,11 +154,11 @@ export default function(game: Phaser.Game) {
         setupTool(toolBean, [[56, 63], [77, 63]], (x, y) => {
           if (leftBean.contains(x, y)) {
             growths++;
-            game.sound.play('grow' + growths);
+            game.sound.play('effect_grow' + growths);
             beanLeft.frame = 0;
           } else if (rightBean.contains(x, y)) {
             growths++;
-            game.sound.play('grow' + growths);
+            game.sound.play('effect_grow' + growths);
             beanRight.frame = 0;
           }
         });
@@ -168,7 +166,7 @@ export default function(game: Phaser.Game) {
 
       const timer = game.time.create();
       timer.add(1000, () => {
-        game.sound.play('thud', 5);
+        game.sound.play('effect_thud', 5);
 
         game.input.onDown.add(() => {
           if (!choseBean) {

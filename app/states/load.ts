@@ -1,4 +1,23 @@
-const PIXELS_PER_PIXEL = 7;
+import * as _ from 'lodash';
+
+import { Music, startState } from '../music';
+
+function usePixelGraphics(game: Phaser.Game, pixelsPerPixel: number) {
+  game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
+  game.scale.setUserScale(pixelsPerPixel, pixelsPerPixel);
+  game.renderer.renderSession.roundPixels = true;
+  Phaser.Canvas.setImageRenderingCrisp(game.canvas);
+}
+
+function addLoadIndicator(game: Phaser.Game) {
+  const loadingEnclosure = game.add.graphics();
+  loadingEnclosure.lineStyle(1, 0xffffff, 1);
+  loadingEnclosure.drawRect(38, 42, 83, 5);
+
+  const loadingTexture = game.make.bitmapData(80, 2);
+  loadingTexture.fill(0xff, 0xff, 0xff);
+  game.load.setPreloadSprite(game.add.sprite(40, 44, loadingTexture));
+}
 
 function loadAudio(game: Phaser.Game, key: string, filename: string) {
   game.load.audio(key, [
@@ -7,117 +26,153 @@ function loadAudio(game: Phaser.Game, key: string, filename: string) {
   ]);
 }
 
+const sounds = [
+  ['music_title', 'Music/TitleMusic'],
+  ['music_fun1', 'Music/Fun1'],
+  ['music_fun1_bitcrushed', 'Music/Fun1Bitcrushed'],
+  ['music_fun2', 'Music/Fun2'],
+  ['music_fun2_bitcrushed', 'Music/Fun2Bitcrushed'],
+  ['music_fun3', 'Music/Fun3'],
+  ['music_fun3_bitcrushed', 'Music/Fun3Bitcrushed'],
+  ['music_fun4', 'Music/Fun4'],
+  ['music_fun4_bitcrushed', 'Music/Fun4Bitcrushed'],
+  ['music_end', 'Music/End'],
+
+  ['effect_root1', 'SoundEffects/RootGrow1'],
+  ['effect_root2', 'SoundEffects/RootGrow2'],
+  ['effect_root3', 'SoundEffects/RootGrow3'],
+  ['effect_root4', 'SoundEffects/RootGrow4'],
+  ['effect_root5', 'SoundEffects/RootGrow5'],
+  ['effect_root6', 'SoundEffects/RootGrow6'],
+  ['effect_root7', 'SoundEffects/RootGrow7'],
+  ['effect_shatter', 'SoundEffects/PotShattering'],
+
+  ['effect_thud', 'SoundEffects/Thud'],
+  ['effect_bean', 'SoundEffects/BeanPlant'],
+  ['effect_grow1', 'SoundEffects/Grow1'],
+  ['effect_grow2', 'SoundEffects/Grow2'],
+  ['effect_grow3', 'SoundEffects/Grow3'],
+  ['effect_grow4', 'SoundEffects/Grow4'],
+  ['effect_grow5', 'SoundEffects/Grow5'],
+  ['effect_grow6', 'SoundEffects/Grow6'],
+  ['effect_snap', 'SoundEffects/VineSnap'],
+];
+
+function loadSounds(game: Phaser.Game) {
+  sounds.forEach(([key, filename]) => loadAudio(game, key, filename));
+}
+
+function soundsReady(game: Phaser.Game) {
+  return sounds.every(([key, _]) => game.cache.isSoundDecoded(key));
+}
+
+const tracks = ['title', 'fun1', 'fun2', 'fun3', 'fun4', 'end'];
+
+function startMusic(game: Phaser.Game) {
+  const music = new Music(game, tracks);
+  music.play();
+  return music;
+}
+
+function sceneImageLoader(prefix: string, path: string) {
+  return (game: Phaser.Game, key: string, filename: string) => {
+    game.load.image(
+      prefix + '_' + key, 'Image/' + path + '/' + filename + '.png'
+    );
+  };
+}
+
+function sceneSheetLoader(prefix: string, path: string) {
+  return (game: Phaser.Game, key: string, filename: string) => {
+    game.load.spritesheet(
+      prefix + '_' + key, 'Image/' + path + '/' + filename + '.png', 160, 90
+    );
+  };
+}
+
+const loadMenuImage = sceneImageLoader('menu', 'menu');
+
+function loadMenuImages(game: Phaser.Game) {
+  loadMenuImage(game, 'background', 'startmenubackground');
+  loadMenuImage(game, 'start', 'startmenu');
+  loadMenuImage(game, 'resume', 'resumenu');
+}
+
+const loadPotImage = sceneImageLoader('pot', 'scene1');
+const loadPotSheet = sceneSheetLoader('pot', 'scene1');
+
+function loadPotImages(game: Phaser.Game) {
+  loadPotImage(game, 'bg', 'blurredbg');
+  loadPotImage(game, 'shelf', 'shelf');
+  loadPotImage(game, 'shelf_hl', 'shelfhighlighting');
+  loadPotImage(game, 'cross', 'pottransparent');
+  loadPotImage(game, 'root', 'root1');
+  loadPotSheet(game, 'rootleft', 'rootleft spritesheet');
+  loadPotSheet(game, 'rootright', 'rootright spritesheet');
+  loadPotSheet(game, 'plant', 'plantwilt spritesheet');
+  loadPotSheet(game, 'blood', 'plantblood spritesheet');
+  loadPotSheet(game, 'pot', 'potbreaking spritesheet');
+  loadPotImage(game, 'pot_hl', 'pothighlighting');
+
+  _.range(1, 7).forEach(shard => loadPotImage(
+    game, 'backshard' + shard,
+    'potbreaking shards/backshard' + shard + 'start'
+  ));
+  loadPotImage(game, 'float', 'potbreaking shards/plantanddirt');
+  _.range(1, 7).forEach(shard => loadPotImage(
+    game, 'frontshard' + shard,
+    'potbreaking shards/frontshard' + shard + 'start'
+  ));
+
+  loadPotImage(game, 'mess', 'potmess(frame1)');
+  loadPotImage(game, 'fall', 'plantfall(frame1)');
+}
+
+const loadRoomImage = sceneImageLoader('room', 'scene2');
+const loadRoomSheet = sceneSheetLoader('room', 'scene2');
+
+function loadRoomImages(game: Phaser.Game) {
+  loadRoomImage(game, 'toolbar', 'toolbar');
+  loadRoomImage(game, 'toolorig', 'planticon (1,2)');
+  loadRoomImage(game, 'toolbean', 'beanicon (12,1)');
+  loadRoomImage(game, 'toolvine', 'vineicon (22,3)');
+
+  loadRoomImage(game, 'bg', 'background2');
+  loadRoomSheet(game, 'vines', 'vine spritesheet');
+  loadRoomSheet(game, 'beanleft', 'beanleft spritesheet');
+  loadRoomSheet(game, 'beanright', 'beanright spritesheet');
+  loadRoomSheet(game, 'otherbeans', 'otherbeans spritesheet');
+  loadRoomImage(game, 'int', 'wallinterior');
+  loadRoomSheet(game, 'plant', 'plant spritesheet');
+  loadRoomImage(game, 'pot', 'brokenpotshards');
+}
+
+const loadPlanetSheet = sceneSheetLoader('planet', 'scenefinal');
+
+function loadPlanetImages(game: Phaser.Game) {
+  loadPlanetSheet(game, 'animation', 'scenefinal spritesheet');
+}
+
+function loadCreditsImages(game: Phaser.Game) {
+  game.load.image('credits', 'Image/credits.png');
+}
+
 export default function(game: Phaser.Game) {
   return {
     preload() {
-      game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
-      game.scale.setUserScale(PIXELS_PER_PIXEL, PIXELS_PER_PIXEL);
-      game.renderer.renderSession.roundPixels = true;
-      Phaser.Canvas.setImageRenderingCrisp(game.canvas);
-
-      const loadingEnclosure = game.add.graphics();
-      loadingEnclosure.lineStyle(1, 0xffffff, 1);
-      loadingEnclosure.drawRect(38, 42, 83, 5);
-
-      const loadingTexture = game.make.bitmapData(80, 2);
-      loadingTexture.fill(0xff, 0xff, 0xff);
-      game.load.setPreloadSprite(game.add.sprite(40, 44, loadingTexture));
-
-      loadAudio(game, 'music0', 'Music/TitleMusic');
-      loadAudio(game, 'music1', 'Music/Fun1');
-      loadAudio(game, 'music2', 'Music/Fun2');
-      loadAudio(game, 'music3', 'Music/Fun3');
-      loadAudio(game, 'music4', 'Music/Fun4');
-      loadAudio(game, 'music5', 'Music/Fun1Bitcrushed');
-
-      loadAudio(game, 'end', 'Music/End');
-
-      game.load.image('menu_background', 'Image/menu/startmenubackground.png');
-      game.load.image('menu_start', 'Image/menu/startmenu.png');
-      game.load.image('menu_resume', 'Image/menu/resumenu.png');
-
-      game.load.image('toolbar', 'Image/scene2/toolbar.png');
-      game.load.image('toolbar_orig', 'Image/scene2/planticon (1,2).png');
-      game.load.image('toolbar_bean', 'Image/scene2/beanicon (12,1).png');
-      game.load.image('toolbar_vine', 'Image/scene2/vineicon (22,3).png');
-
-      loadAudio(game, 'root1', 'SoundEffects/RootGrow1');
-      loadAudio(game, 'root2', 'SoundEffects/RootGrow2');
-      loadAudio(game, 'root3', 'SoundEffects/RootGrow3');
-      loadAudio(game, 'root4', 'SoundEffects/RootGrow4');
-      loadAudio(game, 'root5', 'SoundEffects/RootGrow5');
-      loadAudio(game, 'root6', 'SoundEffects/RootGrow6');
-      loadAudio(game, 'root7', 'SoundEffects/RootGrow7');
-      loadAudio(game, 'shatter', 'SoundEffects/PotShattering');
-
-      game.load.image('pot_bg', 'Image/scene1/blurredbg.png');
-      game.load.image('pot_shelf', 'Image/scene1/shelf.png');
-      game.load.image('pot_shelf_hl', 'Image/scene1/shelfhighlighting.png');
-      game.load.image('pot_cross', 'Image/scene1/pottransparent.png');
-      game.load.image('pot_root', 'Image/scene1/root1.png');
-      game.load.image('pot_pot_hl', 'Image/scene1/pothighlighting.png');
-
-      game.load.image('pot_backshard1', 'Image/scene1/potbreaking shards/backshard1start.png');
-      game.load.image('pot_backshard2', 'Image/scene1/potbreaking shards/backshard2start.png');
-      game.load.image('pot_backshard3', 'Image/scene1/potbreaking shards/backshard3start.png');
-      game.load.image('pot_backshard4', 'Image/scene1/potbreaking shards/backshard4start.png');
-      game.load.image('pot_backshard5', 'Image/scene1/potbreaking shards/backshard5start.png');
-      game.load.image('pot_backshard6', 'Image/scene1/potbreaking shards/backshard6start.png');
-      game.load.image('pot_float', 'Image/scene1/potbreaking shards/plantanddirt.png');
-      game.load.image('pot_frontshard1', 'Image/scene1/potbreaking shards/frontshard1start.png');
-      game.load.image('pot_frontshard2', 'Image/scene1/potbreaking shards/frontshard2start.png');
-      game.load.image('pot_frontshard3', 'Image/scene1/potbreaking shards/frontshard3start.png');
-      game.load.image('pot_frontshard4', 'Image/scene1/potbreaking shards/frontshard4start.png');
-      game.load.image('pot_frontshard5', 'Image/scene1/potbreaking shards/frontshard5start.png');
-      game.load.image('pot_frontshard6', 'Image/scene1/potbreaking shards/frontshard6start.png');
-
-      game.load.image('pot_mess', 'Image/scene1/potmess(frame1).png');
-      game.load.image('pot_fall', 'Image/scene1/plantfall(frame1).png');
-
-      game.load.spritesheet('pot_plant', 'Image/scene1/plantwilt spritesheet.png', 160, 90);
-      game.load.spritesheet('pot_blood', 'Image/scene1/plantblood spritesheet.png', 160, 90);
-      game.load.spritesheet('pot_pot', 'Image/scene1/potbreaking spritesheet.png', 160, 90);
-      game.load.spritesheet('pot_rootleft', 'Image/scene1/rootleft spritesheet.png', 160, 90);
-      game.load.spritesheet('pot_rootright', 'Image/scene1/rootright spritesheet.png', 160, 90);
-
-      loadAudio(game, 'thud', 'SoundEffects/Thud');
-      loadAudio(game, 'bean', 'SoundEffects/BeanPlant');
-      loadAudio(game, 'grow1', 'SoundEffects/Grow1');
-      loadAudio(game, 'grow2', 'SoundEffects/Grow2');
-      loadAudio(game, 'grow3', 'SoundEffects/Grow3');
-      loadAudio(game, 'grow4', 'SoundEffects/Grow4');
-      loadAudio(game, 'grow5', 'SoundEffects/Grow5');
-      loadAudio(game, 'grow6', 'SoundEffects/Grow6');
-      loadAudio(game, 'snap', 'SoundEffects/VineSnap');
-
-      game.load.image('room_bg', 'Image/scene2/background2.png');
-      game.load.image('room_int', 'Image/scene2/wallinterior.png');
-      game.load.image('room_pot', 'Image/scene2/brokenpotshards.png');
-
-      game.load.spritesheet('room_vines', 'Image/scene2/vine spritesheet.png', 160, 90);
-      game.load.spritesheet('room_beanleft', 'Image/scene2/beanleft spritesheet.png', 160, 90);
-      game.load.spritesheet('room_beanright', 'Image/scene2/beanright spritesheet.png', 160, 90);
-      game.load.spritesheet('room_otherbeans', 'Image/scene2/otherbeans spritesheet.png', 160, 90);
-      game.load.spritesheet('room_plant', 'Image/scene2/plant spritesheet.png', 160, 90);
-
-      game.load.spritesheet('planet', 'Image/scenefinal/scenefinal spritesheet.png', 160, 90);
-
-      game.load.image('credits', 'Image/credits.png');
+      usePixelGraphics(game, 7);
+      addLoadIndicator(game);
+      loadSounds(game);
+      loadMenuImages(game);
+      loadPotImages(game);
+      loadRoomImages(game);
+      loadPlanetImages(game);
+      loadCreditsImages(game);
     },
 
     update() {
-      const ready = [0, 1, 2, 3, 4, 5].every(n => {
-        return game.cache.isSoundDecoded('music' + n);
-      });
-      if (ready) {
-        const musics: Phaser.Sound[] = [];
-        musics.push(game.sound.play('music0', 1, true));
-        musics.push(game.sound.play('music1', 0, true));
-        musics.push(game.sound.play('music2', 0, true));
-        musics.push(game.sound.play('music3', 0, true));
-        musics.push(game.sound.play('music4', 0, true));
-        musics.push(game.sound.play('music5', 0, true));
-        game.state.start('menu', true, false, musics);
+      if (soundsReady(game)) {
+        startState(game, 'menu', startMusic(game));
       }
     }
   };

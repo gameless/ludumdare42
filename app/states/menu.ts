@@ -1,41 +1,39 @@
-export default function(game: Phaser.Game) {
-  const button = new Phaser.Polygon([
-    [16, 25], [13, 57], [145, 64], [145, 30]
-  ].map(([x, y]) => new Phaser.Point(x, y)));
+import { MusicalState, startState } from '../music';
 
-  let musics: Phaser.Sound[];
-  let hl: Phaser.BitmapData;
+const button = new Phaser.Polygon([
+  [16, 25], [13, 57], [145, 64], [145, 30]
+].map(([x, y]) => new Phaser.Point(x, y)));
 
-  return {
-    init(theMusics: Phaser.Sound[]) {
-      musics = theMusics;
-    },
+export default class extends MusicalState {
+  // @ts-ignore
+  hl: Phaser.BitmapData;
 
-    create() {
-      game.add.image(0, 0, 'menu_background');
-      game.add.image(0, 0, 'menu_start');
+  create() {
+    this.music.tracks['title'].good.volume = 1;
 
-      hl = game.make.bitmapData(160, 90);
-      game.add.image(0, 0, hl);
+    this.game.add.image(0, 0, 'menu_background');
+    this.game.add.image(0, 0, 'menu_start');
 
-      game.input.onUp.add(() => {
-        if (button.contains(game.input.x, game.input.y)) {
-          hl.destroy();
-          game.state.start('pot', true, false, musics);
-        }
-      });
-    },
+    this.hl = this.game.make.bitmapData(160, 90);
+    this.game.add.image(0, 0, this.hl);
 
-    render() {
-      hl.clear();
-      if (button.contains(game.input.x, game.input.y)) {
-        hl.blendSourceOver();
-        const alpha = game.input.activePointer.isDown ? 0.75 : 0.5;
-        hl.fill(0xff, 0xff, 0xff, alpha);
-        hl.blendDestinationIn();
-        hl.circle(game.input.x, game.input.y, 10);
-        hl.draw('menu_start');
+    this.game.input.onUp.add(() => {
+      if (button.contains(this.game.input.x, this.game.input.y)) {
+        this.hl.destroy();
+        startState(this.game, 'pot', this.music);
       }
+    });
+  }
+
+  render() {
+    this.hl.clear();
+    if (button.contains(this.game.input.x, this.game.input.y)) {
+      this.hl.blendSourceOver();
+      const alpha = this.game.input.activePointer.isDown ? 0.75 : 0.5;
+      this.hl.fill(0xff, 0xff, 0xff, alpha);
+      this.hl.blendDestinationIn();
+      this.hl.circle(this.game.input.x, this.game.input.y, 10);
+      this.hl.draw('menu_start');
     }
-  };
-};
+  }
+}
