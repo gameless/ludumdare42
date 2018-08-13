@@ -119,7 +119,7 @@ export default class extends MusicalState {
 
             delay(this.game, 1000, () => {
               this.highlight.destroy();
-              startState(this.game, 'planet', this.music);
+              startState(this.game, 'island', this.music, true);
             });
           }
         });

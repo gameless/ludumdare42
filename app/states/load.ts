@@ -36,6 +36,8 @@ const sounds = [
   ['music_fun3_bitcrushed', 'Music/Fun3Bitcrushed'],
   ['music_fun4', 'Music/Fun4'],
   ['music_fun4_bitcrushed', 'Music/Fun4Bitcrushed'],
+  ['music_mid1', 'Music/Mid1'],
+  ['music_mid1_bitcrushed', 'Music/Mid1Bitcrushed'],
   ['music_end', 'Music/End'],
 
   ['effect_root1', 'SoundEffects/RootGrow1'],
@@ -66,7 +68,7 @@ function soundsReady(game: Phaser.Game) {
   return sounds.every(([key, _]) => game.cache.isSoundDecoded(key));
 }
 
-const tracks = ['title', 'fun1', 'fun2', 'fun3', 'fun4', 'end'];
+const tracks = ['title', 'fun1', 'fun2', 'fun3', 'fun4', 'mid1', 'end'];
 
 function sceneImageLoader(prefix: string, path: string) {
   return (game: Phaser.Game, key: string, filename: string) => {
@@ -141,6 +143,16 @@ function loadRoomImages(game: Phaser.Game) {
   loadRoomImage(game, 'pot', 'brokenpotshards');
 }
 
+const loadIslandImage = sceneImageLoader('island', 'scene3');
+const loadIslandSheet = sceneImageLoader('island', 'scene3');
+
+function loadIslandImages(game: Phaser.Game) {
+  loadIslandImage(game, 'bg', 'bg3');
+  loadIslandSheet(game, 'plant', 'plant spritesheet');
+  loadIslandSheet(game, 'seaweed', 'seaweed spritesheet');
+  loadIslandImage(game, 'trees', 'trees');
+}
+
 const loadPlanetSheet = sceneSheetLoader('planet', 'scenefinal');
 
 function loadPlanetImages(game: Phaser.Game) {
@@ -160,6 +172,7 @@ export default function(game: Phaser.Game) {
       loadMenuImages(game);
       loadPotImages(game);
       loadRoomImages(game);
+      loadIslandImages(game);
       loadPlanetImages(game);
       loadCreditsImages(game);
     },
