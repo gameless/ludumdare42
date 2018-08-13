@@ -658,7 +658,7 @@ var default_1 = (function (_super) {
                     if (!shattered) {
                         fade_1.fadeOut(_this.game, 1000);
                         delay_1.delay(_this.game, 1000, function () {
-                            music_1.startState(_this.game, 'pot', _this.music);
+                            music_1.startState(_this.game, 'pot', _this.music, true);
                         });
                     }
                 });
