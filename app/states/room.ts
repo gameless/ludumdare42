@@ -25,8 +25,8 @@ export default function(game: Phaser.Game) {
       const beanRight = game.add.sprite(0, 0, 'room_beanright');
       const otherBeans = game.add.sprite(0, 0, 'room_otherbeans');
       game.add.image(0, 0, 'room_int');
-      game.add.image(0, 0, 'room_pot');
       const plant = game.add.sprite(0, 0, 'room_plant');
+      game.add.image(0, 0, 'room_pot');
       wall = game.add.image(0, 0, 'room_ext');
       wall.alpha = 0;
 
