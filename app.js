@@ -150,20 +150,34 @@ var __makeRelativeRequire = function(require, mappings, pref) {
 require.register("initialize.ts", function(exports, require, module) {
 /// <reference path="../node_modules/phaser-ce/typescript/phaser.d.ts"/>
 "use strict";
-var load_1 = require("./states/load");
-var menu_1 = require("./states/menu");
-var pot_1 = require("./states/pot");
-var room_1 = require("./states/room");
-var planet_1 = require("./states/planet");
-var credits_1 = require("./states/credits");
+var load_1 = require("states/load");
+var menu_1 = require("states/menu");
+var pot_1 = require("states/pot");
+var room_1 = require("states/room");
+var planet_1 = require("states/planet");
+var credits_1 = require("states/credits");
 var game = new Phaser.Game({ width: 160, height: 90, parent: 'parent', antialias: false });
-game.state.add('load', load_1.default(game));
-game.state.add('menu', menu_1.default(game));
-game.state.add('pot', pot_1.default(game));
-game.state.add('room', room_1.default(game));
-game.state.add('planet', planet_1.default(game));
-game.state.add('credits', credits_1.default(game));
+game.state.add('load', load_1.default);
+game.state.add('menu', menu_1.default);
+game.state.add('pot', pot_1.default);
+game.state.add('room', room_1.default);
+game.state.add('planet', planet_1.default);
+game.state.add('credits', credits_1.default);
 game.state.start('load');
+
+
+});
+
+require.register("music.ts", function(exports, require, module) {
+"use strict";
+var Music = (function () {
+    function Music() {
+    }
+    return Music;
+}());
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = Music;
+;
 
 
 });
