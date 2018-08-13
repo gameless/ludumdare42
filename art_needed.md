@@ -1,9 +1,6 @@
 Art Needed
 ==========
 
-Pot
----
-
 Room
 ----
 
@@ -15,5 +12,7 @@ Room
     place them in the scene
 - one or two spritesheets for the vines the player can grow
 
-Planet
+Island
 ------
+
+...
