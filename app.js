@@ -155,12 +155,14 @@ var menu_1 = require("./states/menu");
 var pot_1 = require("./states/pot");
 var room_1 = require("./states/room");
 var planet_1 = require("./states/planet");
+var credits_1 = require("./states/credits");
 var game = new Phaser.Game({ width: 160, height: 90, parent: 'parent', antialias: false });
 game.state.add('boot', boot_1.default(game));
 game.state.add('menu', menu_1.default(game));
 game.state.add('pot', pot_1.default(game));
 game.state.add('room', room_1.default(game));
 game.state.add('planet', planet_1.default(game));
+game.state.add('credits', credits_1.default(game));
 game.state.start('boot');
 
 
@@ -182,7 +184,8 @@ function default_1(game) {
             loadAudio('music2', 'Music/Fun2');
             loadAudio('music3', 'Music/Fun3');
             loadAudio('music4', 'Music/Fun4');
-            loadAudio('music5', 'Music/LongEndHalfWhirr');
+            loadAudio('music5', 'Music/Fun1Bitcrushed');
+            loadAudio('end', 'Music/End');
             game.load.image('menu_background', 'Image/menu/startmenubackground.png');
             game.load.image('menu_start', 'Image/menu/startmenu.png');
             game.load.image('menu_resume', 'Image/menu/resumenu.png');
@@ -204,7 +207,6 @@ function default_1(game) {
             game.load.image('pot_cross', 'Image/scene1/pottransparent.png');
             game.load.image('pot_root', 'Image/scene1/root1.png');
             game.load.image('pot_pot_hl', 'Image/scene1/pothighlighting.png');
-            game.load.image('pot_plant', 'Image/scene1/plant1.png');
             game.load.image('pot_backshard1', 'Image/scene1/potbreaking shards/backshard1start.png');
             game.load.image('pot_backshard2', 'Image/scene1/potbreaking shards/backshard2start.png');
             game.load.image('pot_backshard3', 'Image/scene1/potbreaking shards/backshard3start.png');
@@ -220,6 +222,8 @@ function default_1(game) {
             game.load.image('pot_frontshard6', 'Image/scene1/potbreaking shards/frontshard6start.png');
             game.load.image('pot_mess', 'Image/scene1/potmess(frame1).png');
             game.load.image('pot_fall', 'Image/scene1/plantfall(frame1).png');
+            game.load.spritesheet('pot_plant', 'Image/scene1/plantwilt spritesheet.png', 160, 90);
+            game.load.spritesheet('pot_blood', 'Image/scene1/plantblood spritesheet.png', 160, 90);
             game.load.spritesheet('pot_pot', 'Image/scene1/potbreaking spritesheet.png', 160, 90);
             game.load.spritesheet('pot_rootleft', 'Image/scene1/rootleft spritesheet.png', 160, 90);
             game.load.spritesheet('pot_rootright', 'Image/scene1/rootright spritesheet.png', 160, 90);
@@ -240,7 +244,8 @@ function default_1(game) {
             game.load.spritesheet('room_beanleft', 'Image/scene2/beanleft spritesheet.png', 160, 90);
             game.load.spritesheet('room_beanright', 'Image/scene2/beanright spritesheet.png', 160, 90);
             game.load.spritesheet('room_otherbeans', 'Image/scene2/otherbeans spritesheet.png', 160, 90);
-            game.load.spritesheet('room_plant', 'Image/scene2/plantfall spritesheet.png', 160, 90);
+            game.load.spritesheet('room_plant', 'Image/scene2/plant spritesheet.png', 160, 90);
+            game.load.spritesheet('planet', 'Image/scenefinal/scenefinal spritesheet.png', 160, 90);
         },
         create: function () {
             game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
@@ -256,6 +261,30 @@ function default_1(game) {
             musics.push(game.sound.play('music4', 0, true));
             musics.push(game.sound.play('music5', 0, true));
             game.state.start('menu', true, false, musics);
+        }
+    };
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
+;
+
+
+});
+
+require.register("states/credits.ts", function(exports, require, module) {
+"use strict";
+function default_1(game) {
+    return {
+        create: function () {
+            var credits = 'Art: Laura Estep\nCode: Sam Estep\nSound: Ezra LaFleur';
+            var style = { font: '16px sans', fill: '#ffffff' };
+            var text = game.add.text(0, 0, credits, style);
+            text.alpha = 0;
+            var fadeInTimer = game.time.create();
+            fadeInTimer.add(1000, function () {
+                game.add.tween(text).to({ alpha: 1 }, 2000).start();
+            });
+            fadeInTimer.start();
         }
     };
 }
@@ -327,8 +356,16 @@ function default_1(game) {
             musics[2].fadeTo(500, 0);
             musics[3].fadeTo(500, 0);
             musics[4].fadeTo(500, 0);
-            musics[5].fadeTo(500, 1);
-            game.add.image(0, 0, 'room_bg'); // temporary
+            musics[5].fadeTo(500, 0);
+            game.sound.play('end');
+            var dieTimer = game.time.create();
+            dieTimer.add(18000, function () {
+                game.state.start('credits');
+            });
+            dieTimer.start();
+            var planet = game.add.sprite(0, 0, 'planet');
+            planet.animations.add('die');
+            planet.animations.play('die', 0.25);
             var darken = game.add.graphics();
             darken.beginFill(0x000000);
             darken.drawRect(0, 0, 160, 90);
@@ -376,9 +413,22 @@ function default_1(game) {
             rootRight = game.add.sprite(0, 0, 'pot_rootright');
             hl = game.make.bitmapData(160, 90);
             hl_image = game.add.image(0, 0, hl);
+            var plant = game.add.sprite(0, 0, 'pot_plant');
+            var blood = game.add.sprite(0, 0, 'pot_blood');
+            blood.animations.add('spread');
+            blood.animations.play('spread', 0.5);
+            var wiltTimer = game.time.create();
+            wiltTimer.add(16000, function () {
+                musics[1].fadeTo(8000, 0);
+                musics[5].fadeTo(8000, 1);
+                if (!shattered) {
+                    plant.animations.add('wilt');
+                    plant.animations.play('wilt', 0.25);
+                }
+            });
+            wiltTimer.start();
             pot = game.add.sprite(0, 0, 'pot_pot');
             var pot_hl = game.add.image(0, 0, 'pot_pot_hl');
-            var plant = game.add.image(0, 0, 'pot_plant');
             hover = new Phaser.Signal();
             hover.add(function () {
                 var newAlpha = (hovering && showCross) ? 0 : 1;
@@ -421,8 +471,9 @@ function default_1(game) {
                         root.destroy();
                         rootLeft.destroy();
                         rootRight.destroy();
-                        pot.destroy();
                         plant.destroy();
+                        blood.destroy();
+                        pot.destroy();
                         hl_image.destroy();
                         var shatterTime = 375;
                         var easing = Phaser.Easing.Sinusoidal.InOut;
@@ -549,14 +600,16 @@ function default_1(game) {
             musics[1].fadeTo(500, 0);
             musics[2].fadeTo(500, 0);
             musics[3].fadeTo(500, 1);
+            musics[4].fadeTo(500, 0);
+            musics[5].fadeTo(500, 0);
             game.add.image(0, 0, 'room_bg');
             var vines = game.add.sprite(0, 0, 'room_vines');
             var beanLeft = game.add.sprite(0, 0, 'room_beanleft');
             var beanRight = game.add.sprite(0, 0, 'room_beanright');
             var otherBeans = game.add.sprite(0, 0, 'room_otherbeans');
             game.add.image(0, 0, 'room_int');
-            game.add.image(0, 0, 'room_pot');
             var plant = game.add.sprite(0, 0, 'room_plant');
+            game.add.image(0, 0, 'room_pot');
             wall = game.add.image(0, 0, 'room_ext');
             wall.alpha = 0;
             var toolbar = game.add.image(0, 0, 'toolbar');
