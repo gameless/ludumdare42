@@ -259,6 +259,13 @@ function default_1(game) {
                 return game.cache.isSoundDecoded('music' + n);
             });
             if (ready) {
+                var loadingTag = document.getElementById('loading');
+                if (loadingTag) {
+                    var parent = loadingTag.parentNode;
+                    if (parent) {
+                        parent.removeChild(loadingTag);
+                    }
+                }
                 var musics = [];
                 musics.push(game.sound.play('music0', 1, true));
                 musics.push(game.sound.play('music1', 0, true));
