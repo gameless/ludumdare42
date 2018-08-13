@@ -60,7 +60,7 @@ export default function(game: Phaser.Game) {
       darken.endFill();
       game.add.tween(darken).to({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
 
-      plant.animations.add('fall');
+      plant.animations.add('fall', [0, 1, 2]);
       plant.animations.play('fall', 2);
 
       hover = new Phaser.Signal();
