@@ -253,14 +253,21 @@ function default_1(game) {
             game.renderer.renderSession.roundPixels = true;
             Phaser.Canvas.setImageRenderingCrisp(game.canvas);
             game.camera.bounds = game.world.bounds;
-            var musics = [];
-            musics.push(game.sound.play('music0', 1, true));
-            musics.push(game.sound.play('music1', 0, true));
-            musics.push(game.sound.play('music2', 0, true));
-            musics.push(game.sound.play('music3', 0, true));
-            musics.push(game.sound.play('music4', 0, true));
-            musics.push(game.sound.play('music5', 0, true));
-            game.state.start('menu', true, false, musics);
+        },
+        update: function () {
+            var ready = [0, 1, 2, 3, 4, 5].every(function (n) {
+                return game.cache.isSoundDecoded('music' + n);
+            });
+            if (ready) {
+                var musics = [];
+                musics.push(game.sound.play('music0', 1, true));
+                musics.push(game.sound.play('music1', 0, true));
+                musics.push(game.sound.play('music2', 0, true));
+                musics.push(game.sound.play('music3', 0, true));
+                musics.push(game.sound.play('music4', 0, true));
+                musics.push(game.sound.play('music5', 0, true));
+                game.state.start('menu', true, false, musics);
+            }
         }
     };
 }
