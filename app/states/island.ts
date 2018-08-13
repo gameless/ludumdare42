@@ -28,7 +28,7 @@ export default class extends MusicalState {
     const plant = this.game.add.sprite(0, 0, 'island_plant');
     const seaweed = this.game.add.sprite(0, 0, 'island_seaweed');
 
-    plant.animations.add('something').play(2);
+    plant.animations.add('grow').play(2);
 
     this.game.input.keyboard.addCallbacks(this, (event: KeyboardEvent) => {
       if (event.keyCode === escapeCode) {
@@ -51,6 +51,7 @@ export default class extends MusicalState {
     delay(this.game, 1000, () => {
       this.game.input.onUp.add(() => {
         if (seaweedBox.contains(this.game.input.x, this.game.input.y)) {
+          seaweed.animations.add('shrink', [1, 2]).play(2);
           fadeOut(this.game, 1000);
           delay(this.game, 1000, () => {
             this.highlight.destroy();
