@@ -182,11 +182,21 @@ var Track = (function () {
         this.good = good;
         this.bad = bad;
         this.same = same;
+        this.portion = 0;
     }
     Track.prototype.play = function () {
         this.good.play();
         if (!this.same) {
             this.bad.play();
+        }
+    };
+    Track.prototype.updateVolume = function (badness) {
+        if (this.same) {
+            this.good.volume = this.portion;
+        }
+        else {
+            this.bad.volume = badness * this.portion;
+            this.good.volume = this.portion - this.bad.volume;
         }
     };
     return Track;
@@ -205,11 +215,41 @@ function getTrack(game, key) {
 var Music = (function () {
     function Music(game, keys) {
         var _this = this;
+        this.game = game;
         this.tracks = {};
         keys.forEach(function (key) { return _this.tracks[key] = getTrack(game, key); });
+        this.badness = 0;
     }
     Music.prototype.play = function () {
         _.forOwn(this.tracks, function (track) { return track.play(); });
+    };
+    Music.prototype.updateVolumes = function () {
+        var _this = this;
+        _.forOwn(this.tracks, function (track) { return track.updateVolume(_this.badness); });
+    };
+    Music.prototype.fadeTrack = function (duration, key) {
+        var _this = this;
+        _.forOwn(this.tracks, function (track, trackKey) {
+            var tween = _this.game.add.tween(track);
+            tween.to({ portion: trackKey === key ? 1 : 0 }, duration);
+            tween.onUpdateCallback(function () { return _this.updateVolumes(); });
+            tween.onComplete.add(function () { return _this.updateVolumes(); });
+            tween.start();
+        });
+    };
+    Music.prototype.fadeBadness = function (duration, badness) {
+        var _this = this;
+        var tween = this.game.add.tween(this);
+        tween.to({ badness: badness }, duration);
+        tween.onUpdateCallback(function () { return _this.updateVolumes(); });
+        tween.onComplete.add(function () { return _this.updateVolumes(); });
+        tween.start();
+    };
+    Music.prototype.setTrack = function (key) {
+        this.fadeTrack(1, key);
+    };
+    Music.prototype.setBadness = function (badness) {
+        this.fadeBadness(1, badness);
     };
     return Music;
 }());
@@ -433,7 +473,7 @@ var default_1 = (function (_super) {
     }
     default_1.prototype.create = function () {
         var _this = this;
-        this.music.tracks['title'].good.volume = 1;
+        this.music.setTrack('title');
         this.game.add.image(0, 0, 'menu_background');
         this.game.add.image(0, 0, 'menu_start');
         this.hl = this.game.make.bitmapData(160, 90);
@@ -473,8 +513,8 @@ function default_1(game) {
             music = theMusic;
         },
         create: function () {
-            music.tracks['fun4'].good.fadeTo(500, 0);
-            music.tracks['end'].good.play('', 0, 1, false);
+            music.setTrack('end');
+            music.play();
             var dieTimer = game.time.create();
             dieTimer.add(18000, function () {
                 game.state.start('credits');
@@ -520,8 +560,7 @@ function default_1(game) {
             music = theMusic;
         },
         create: function () {
-            music.tracks['title'].good.fadeTo(500, 0);
-            music.tracks['fun1'].good.fadeTo(500, 1);
+            music.fadeTrack(500, 'fun1');
             game.add.image(0, 0, 'pot_bg');
             game.add.image(0, 0, 'pot_shelf');
             game.add.image(0, 0, 'pot_shelf_hl');
@@ -537,8 +576,7 @@ function default_1(game) {
             blood.animations.play('spread', 0.5);
             var wiltTimer = game.time.create();
             wiltTimer.add(16000, function () {
-                music.tracks['fun1'].good.fadeTo(8000, 0);
-                music.tracks['fun1'].bad.fadeTo(8000, 1);
+                music.fadeBadness(8000, 1);
                 if (!shattered) {
                     plant.animations.add('wilt');
                     plant.animations.play('wilt', 0.25);
@@ -571,8 +609,7 @@ function default_1(game) {
                             rootRight.frame = rightGrowth;
                         }
                         if (leftGrowth === 4 && rightGrowth === 3) {
-                            music.tracks['fun1'].good.fadeTo(500, 0);
-                            music.tracks['fun2'].good.fadeTo(500, 1);
+                            music.fadeTrack(500, 'fun2');
                             pot_hl.destroy();
                             hl_image.destroy();
                             game.add.image(0, 0, hl);
@@ -717,8 +754,7 @@ function default_1(game) {
             music = theMusic;
         },
         create: function () {
-            music.tracks['fun2'].good.fadeTo(500, 0);
-            music.tracks['fun3'].good.fadeTo(500, 1);
+            music.fadeTrack(500, 'fun3');
             game.add.image(0, 0, 'room_bg');
             var vines = game.add.sprite(0, 0, 'room_vines');
             beanLeft = game.add.sprite(0, 0, 'room_beanleft');
@@ -807,8 +843,7 @@ function default_1(game) {
                     var vine = new Phaser.Rectangle(82, 40, 12, 12);
                     if (beanRight.frame < 1 && vine.contains(x, y)) {
                         game.sound.play('effect_snap');
-                        music.tracks['fun3'].good.fadeTo(500, 0);
-                        music.tracks['fun4'].good.fadeTo(500, 1);
+                        music.fadeTrack(500, 'fun4');
                         vines.frame = 1;
                         game.add.tween(toolVine).to({ alpha: 1 }, 500).start();
                         setupTool(toolVine, [[88, 45]], function (x, y) {
