@@ -2,10 +2,10 @@
 
 import loadState from './states/load';
 import MenuState from './states/menu';
-import potState from './states/pot';
-import roomState from './states/room';
-import planetState from './states/planet';
-import creditsState from './states/credits';
+import PotState from './states/pot';
+import RoomState from './states/room';
+import PlanetState from './states/planet';
+import CreditsState from './states/credits';
 
 const game = new Phaser.Game(
   { width: 160, height: 90, parent: 'parent', antialias: false }
@@ -13,9 +13,9 @@ const game = new Phaser.Game(
 
 game.state.add('load', loadState);
 game.state.add('menu', MenuState);
-game.state.add('pot', potState);
-game.state.add('room', roomState);
-game.state.add('planet', planetState);
-game.state.add('credits', creditsState);
+game.state.add('pot', PotState);
+game.state.add('room', RoomState);
+game.state.add('planet', PlanetState);
+game.state.add('credits', CreditsState);
 
 game.state.start('load');

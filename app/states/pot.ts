@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import { delay } from '../delay';
 import { fadeIn, fadeOut } from '../fade';
 import { Highlight } from '../highlight';
+import { escapeCode } from '../pause';
 import { Music, MusicalState, startState } from '../music';
 
 const closeToPot = new Phaser.Polygon([
@@ -47,6 +48,7 @@ export default class extends MusicalState {
           if (!shattered) {
             fadeOut(this.game, 1000);
             delay(this.game, 1000, () => {
+              this.highlight.destroy();
               startState(this.game, 'pot', this.music, true);
             });
           }
@@ -82,6 +84,8 @@ export default class extends MusicalState {
   }
 
   create() {
+    this.game.input.keyboard.removeCallbacks();
+
     this.music.fadeTrack(500, 'fun1');
     this.music.fadeBadness(500, 0);
 
@@ -96,6 +100,13 @@ export default class extends MusicalState {
     const blood = this.game.add.sprite(0, 0, 'pot_blood');
     const pot = this.game.add.sprite(0, 0, 'pot_pot');
     const pot_hl = this.game.add.image(0, 0, 'pot_pot_hl');
+
+    this.game.input.keyboard.addCallbacks(this, (event: KeyboardEvent) => {
+      if (event.keyCode === escapeCode) {
+        this.highlight.destroy();
+        startState(this.game, 'menu', this.music, 'pot');
+      }
+    });
 
     let leftGrowth = 0;
     let rightGrowth = 0;
@@ -207,7 +218,7 @@ export default class extends MusicalState {
 
             delay(this.game, 1000, () => {
               this.highlight.destroy();
-              startState(this.game, 'room', this.music);
+              startState(this.game, 'room', this.music, true);
             });
           });
         }

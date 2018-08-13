@@ -1,12 +1,15 @@
 import { delay } from '../delay';
 import { fadeIn, fadeOut } from '../fade';
 import { Highlight } from '../highlight';
-import { MusicalState, startState } from '../music';
+import { escapeCode } from '../pause';
+import { Music, MusicalState, startState } from '../music';
 
 const leftBean = new Phaser.Rectangle(53, 53, 8, 15);
 const rightBean = new Phaser.Rectangle(73, 53, 8, 15);
 
 export default class extends MusicalState {
+  startFade = true;
+
   // @ts-ignore
   highlight: Highlight;
   // @ts-ignore
@@ -25,6 +28,11 @@ export default class extends MusicalState {
   toolBean: Phaser.Image;
   // @ts-ignore
   toolVine: Phaser.Image;
+
+  init(music: Music, startFade: boolean) {
+    super.init(music);
+    this.startFade = startFade;
+  }
 
   setupTool(
     tool: Phaser.Image,
@@ -134,6 +142,8 @@ export default class extends MusicalState {
   }
 
   create() {
+    this.game.input.keyboard.removeCallbacks();
+
     this.music.fadeTrack(500, 'fun3');
     this.music.fadeBadness(500, 0);
 
@@ -149,6 +159,13 @@ export default class extends MusicalState {
     this.toolOrig = this.game.add.image(1, 2, 'room_toolorig');
     this.toolBean = this.game.add.image(12, 1, 'room_toolbean');
     this.toolVine = this.game.add.image(22, 3, 'room_toolvine');
+
+    this.game.input.keyboard.addCallbacks(this, (event: KeyboardEvent) => {
+      if (event.keyCode === escapeCode) {
+        this.highlight.destroy();
+        startState(this.game, 'menu', this.music, 'room');
+      }
+    });
 
     this.toolbar.alpha = 0;
     this.toolOrig.alpha = 0;
@@ -169,7 +186,9 @@ export default class extends MusicalState {
       return null;
     });
 
-    fadeIn(this.game, 1000);
+    if (this.startFade) {
+      fadeIn(this.game, 1000);
+    }
 
     plant.animations.add('fall', [0, 1, 2]);
     plant.animations.play('fall', 2);
