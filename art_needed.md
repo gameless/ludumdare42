@@ -7,8 +7,6 @@ Pot
 Room
 ----
 
-- more frames in the plant spritesheet:
-  - reaching out to the left or right to grab the bean plants
 - blood spreading
   - the blood needs to be able to reach the bean plants and the vines that the
     player grows
