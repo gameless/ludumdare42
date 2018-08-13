@@ -13,8 +13,9 @@ export default function(game: Phaser.Game) {
       loadAudio('music2', 'Music/Fun2');
       loadAudio('music3', 'Music/Fun3');
       loadAudio('music4', 'Music/Fun4');
-      loadAudio('music5', 'Music/LongEndHalfWhirr');
-      loadAudio('music6', 'Music/Fun1Bitcrushed');
+      loadAudio('music5', 'Music/Fun1Bitcrushed');
+
+      loadAudio('end', 'Music/End');
 
       game.load.image('menu_background', 'Image/menu/startmenubackground.png');
       game.load.image('menu_start', 'Image/menu/startmenu.png');
@@ -103,7 +104,6 @@ export default function(game: Phaser.Game) {
       musics.push(game.sound.play('music3', 0, true));
       musics.push(game.sound.play('music4', 0, true));
       musics.push(game.sound.play('music5', 0, true));
-      musics.push(game.sound.play('music6', 0, true));
 
       game.state.start('menu', true, false, musics);
     }

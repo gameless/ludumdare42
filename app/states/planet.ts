@@ -12,9 +12,18 @@ export default function(game: Phaser.Game) {
       musics[2].fadeTo(500, 0);
       musics[3].fadeTo(500, 0);
       musics[4].fadeTo(500, 0);
-      musics[5].fadeTo(500, 1);
+      musics[5].fadeTo(500, 0);
+      game.sound.play('end');
 
-      game.add.image(0, 0, 'room_bg'); // temporary
+      const dieTimer = game.time.create();
+      dieTimer.add(18000, () => {
+        game.state.start('credits');
+      });
+      dieTimer.start();
+
+      const planet = game.add.sprite(0, 0, 'planet');
+      planet.animations.add('die');
+      planet.animations.play('die', 0.25);
 
       const darken = game.add.graphics();
       darken.beginFill(0x000000);

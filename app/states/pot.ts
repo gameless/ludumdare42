@@ -44,7 +44,7 @@ export default function(game: Phaser.Game) {
       const wiltTimer = game.time.create();
       wiltTimer.add(16000, () => {
         musics[1].fadeTo(8000, 0);
-        musics[6].fadeTo(8000, 1);
+        musics[5].fadeTo(8000, 1);
 
         if (!shattered) {
           plant.animations.add('wilt');

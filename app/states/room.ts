@@ -18,6 +18,8 @@ export default function(game: Phaser.Game) {
       musics[1].fadeTo(500, 0);
       musics[2].fadeTo(500, 0);
       musics[3].fadeTo(500, 1);
+      musics[4].fadeTo(500, 0);
+      musics[5].fadeTo(500, 0);
 
       game.add.image(0, 0, 'room_bg');
       const vines = game.add.sprite(0, 0, 'room_vines');
