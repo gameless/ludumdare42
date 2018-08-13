@@ -1,11 +1,11 @@
 /// <reference path="../node_modules/phaser-ce/typescript/phaser.d.ts"/>
 
-import loadState from 'states/load';
-import menuState from 'states/menu';
-import potState from 'states/pot';
-import roomState from 'states/room';
-import planetState from 'states/planet';
-import creditsState from 'states/credits';
+import loadState from './states/load';
+import menuState from './states/menu';
+import potState from './states/pot';
+import roomState from './states/room';
+import planetState from './states/planet';
+import creditsState from './states/credits';
 
 const game = new Phaser.Game(
   { width: 160, height: 90, parent: 'parent', antialias: false }
