@@ -352,19 +352,42 @@ exports.startState = startState;
 
 });
 
-require.register("states/credits.ts", function(exports, require, module) {
+require.register("pause.ts", function(exports, require, module) {
 "use strict";
-function default_1(game) {
-    return {
-        create: function () {
-            var text = game.add.image(0, 0, 'credits');
-            game.add.tween(text).from({ alpha: 0 }, 2000).delay(1000).start();
-        }
+exports.escapeCode = 27; // keyCode
+
+
+});
+
+;require.register("states/credits.ts", function(exports, require, module) {
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var music_1 = require("../music");
+var pause_1 = require("../pause");
+var default_1 = (function (_super) {
+    __extends(default_1, _super);
+    function default_1() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    default_1.prototype.create = function () {
+        var _this = this;
+        this.game.input.keyboard.removeCallbacks();
+        var text = this.game.add.image(0, 0, 'credits');
+        this.game.add.tween(text).from({ alpha: 0 }, 2000).delay(1000).start();
+        this.game.input.keyboard.addCallbacks(this, function (event) {
+            if (event.keyCode === pause_1.escapeCode) {
+                music_1.startState(_this.game, 'menu', _this.music, 'pot');
+            }
+        });
     };
-}
+    return default_1;
+}(music_1.MusicalState));
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
-;
 
 
 });
@@ -540,8 +563,13 @@ var default_1 = (function (_super) {
     function default_1() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    default_1.prototype.init = function (music, behind) {
+        _super.prototype.init.call(this, music);
+        this.behind = behind || 'pot';
+    };
     default_1.prototype.create = function () {
         var _this = this;
+        this.game.input.keyboard.removeCallbacks();
         this.music.fadeTrack(500, 'title');
         this.music.play(true);
         this.game.add.image(0, 0, 'menu_background');
@@ -552,7 +580,7 @@ var default_1 = (function (_super) {
         this.game.input.onUp.add(function () {
             if (button.contains(_this.game.input.x, _this.game.input.y)) {
                 _this.highlight.destroy();
-                music_1.startState(_this.game, 'pot', _this.music);
+                music_1.startState(_this.game, _this.behind, _this.music);
             }
         });
     };
@@ -583,9 +611,10 @@ var default_1 = (function (_super) {
     }
     default_1.prototype.create = function () {
         var _this = this;
+        this.game.input.keyboard.removeCallbacks();
         this.music.setTrack('end');
         this.music.play(false);
-        delay_1.delay(this.game, 18000, function () { return _this.game.state.start('credits'); });
+        delay_1.delay(this.game, 18000, function () { return music_1.startState(_this.game, 'credits', _this.music); });
         var planet = this.game.add.sprite(0, 0, 'planet_animation');
         planet.animations.add('die');
         planet.animations.play('die', 0.25);
@@ -614,6 +643,7 @@ var _ = require("lodash");
 var delay_1 = require("../delay");
 var fade_1 = require("../fade");
 var highlight_1 = require("../highlight");
+var pause_1 = require("../pause");
 var music_1 = require("../music");
 var closeToPot = new Phaser.Polygon([
     [37, 44],
@@ -658,6 +688,7 @@ var default_1 = (function (_super) {
                     if (!shattered) {
                         fade_1.fadeOut(_this.game, 1000);
                         delay_1.delay(_this.game, 1000, function () {
+                            _this.highlight.destroy();
                             music_1.startState(_this.game, 'pot', _this.music, true);
                         });
                     }
@@ -693,6 +724,7 @@ var default_1 = (function (_super) {
     };
     default_1.prototype.create = function () {
         var _this = this;
+        this.game.input.keyboard.removeCallbacks();
         this.music.fadeTrack(500, 'fun1');
         this.music.fadeBadness(500, 0);
         this.game.add.image(0, 0, 'pot_bg');
@@ -706,6 +738,12 @@ var default_1 = (function (_super) {
         var blood = this.game.add.sprite(0, 0, 'pot_blood');
         var pot = this.game.add.sprite(0, 0, 'pot_pot');
         var pot_hl = this.game.add.image(0, 0, 'pot_pot_hl');
+        this.game.input.keyboard.addCallbacks(this, function (event) {
+            if (event.keyCode === pause_1.escapeCode) {
+                _this.highlight.destroy();
+                music_1.startState(_this.game, 'menu', _this.music, 'pot');
+            }
+        });
         var leftGrowth = 0;
         var rightGrowth = 0;
         var braced = false;
@@ -806,7 +844,7 @@ var default_1 = (function (_super) {
                         _this.game.camera.flash(0xffffff, 500);
                         delay_1.delay(_this.game, 1000, function () {
                             _this.highlight.destroy();
-                            music_1.startState(_this.game, 'room', _this.music);
+                            music_1.startState(_this.game, 'room', _this.music, true);
                         });
                     });
                 }
@@ -834,14 +872,21 @@ var __extends = (this && this.__extends) || function (d, b) {
 var delay_1 = require("../delay");
 var fade_1 = require("../fade");
 var highlight_1 = require("../highlight");
+var pause_1 = require("../pause");
 var music_1 = require("../music");
 var leftBean = new Phaser.Rectangle(53, 53, 8, 15);
 var rightBean = new Phaser.Rectangle(73, 53, 8, 15);
 var default_1 = (function (_super) {
     __extends(default_1, _super);
     function default_1() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.startFade = true;
+        return _this;
     }
+    default_1.prototype.init = function (music, startFade) {
+        _super.prototype.init.call(this, music);
+        this.startFade = startFade;
+    };
     default_1.prototype.setupTool = function (tool, dots, action) {
         var _this = this;
         var initialX = tool.x;
@@ -934,6 +979,7 @@ var default_1 = (function (_super) {
     };
     default_1.prototype.create = function () {
         var _this = this;
+        this.game.input.keyboard.removeCallbacks();
         this.music.fadeTrack(500, 'fun3');
         this.music.fadeBadness(500, 0);
         this.game.add.image(0, 0, 'room_bg');
@@ -948,6 +994,12 @@ var default_1 = (function (_super) {
         this.toolOrig = this.game.add.image(1, 2, 'room_toolorig');
         this.toolBean = this.game.add.image(12, 1, 'room_toolbean');
         this.toolVine = this.game.add.image(22, 3, 'room_toolvine');
+        this.game.input.keyboard.addCallbacks(this, function (event) {
+            if (event.keyCode === pause_1.escapeCode) {
+                _this.highlight.destroy();
+                music_1.startState(_this.game, 'menu', _this.music, 'room');
+            }
+        });
         this.toolbar.alpha = 0;
         this.toolOrig.alpha = 0;
         this.toolBean.alpha = 0;
@@ -965,7 +1017,9 @@ var default_1 = (function (_super) {
             }
             return null;
         });
-        fade_1.fadeIn(this.game, 1000);
+        if (this.startFade) {
+            fade_1.fadeIn(this.game, 1000);
+        }
         plant.animations.add('fall', [0, 1, 2]);
         plant.animations.play('fall', 2);
         delay_1.delay(this.game, 1000, function () {
