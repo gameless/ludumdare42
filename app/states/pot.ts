@@ -69,7 +69,7 @@ export default class extends MusicalState {
         fade.stop();
       }
       fade = self.game.add.tween(pot);
-      fade.to({ alpha: newAlpha }, time, Phaser.Easing.Default, true);
+      fade.to({ alpha: newAlpha }, time).start();
     });
 
     self.game.input.onDown.add(function() {
@@ -156,7 +156,7 @@ export default class extends MusicalState {
             darken.beginFill(0x000000);
             darken.drawRect(0, 0, 160, 90);
             darken.endFill();
-            self.game.add.tween(darken).from({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
+            self.game.add.tween(darken).from({ alpha: 0 }, 1000).start();
 
             self.game.camera.flash(0xffffff, 500);
 
