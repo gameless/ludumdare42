@@ -1,5 +1,5 @@
-Ludum Dare 42
-=============
+Plant's Conquest
+================
 
 Install
 -------
