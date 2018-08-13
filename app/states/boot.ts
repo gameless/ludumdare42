@@ -83,7 +83,9 @@ export default function(game: Phaser.Game) {
       game.load.spritesheet('room_beanleft', 'Image/scene2/beanleft spritesheet.png', 160, 90);
       game.load.spritesheet('room_beanright', 'Image/scene2/beanright spritesheet.png', 160, 90);
       game.load.spritesheet('room_otherbeans', 'Image/scene2/otherbeans spritesheet.png', 160, 90);
-      game.load.spritesheet('room_plant', 'Image/scene2/plantfall spritesheet.png', 160, 90);
+      game.load.spritesheet('room_plant', 'Image/scene2/plant spritesheet.png', 160, 90);
+
+      game.load.spritesheet('planet', 'Image/scenefinal/scenefinal spritesheet.png', 160, 90);
     },
 
     create() {
