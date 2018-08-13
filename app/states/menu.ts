@@ -31,18 +31,24 @@ export default class extends MusicalState {
     this.music.fadeTrack(500, 'title');
 
     this.game.add.image(0, 0, 'menu_background');
-    const start = (this.behind === 'pot');
-    const key = start ? 'menu_start' : 'menu_resume';
-    const buttonSprite = this.game.add.sprite(0, 0, key);
+    const buttonSprites: Phaser.Sprite[] = [];
+    if (this.behind === 'pot') {
+      buttonSprites.push(this.game.add.sprite(0, 0, 'menu_start'));
+    } else {
+      buttonSprites.push(this.game.add.sprite(0, 0, 'menu_resume'));
+      buttonSprites.push(this.game.add.sprite(0, 0, 'menu_restart'));
+    }
 
     this.highlight = new Highlight(this.game, (x, y) => {
-      if (start) {
+      if (this.behind === 'pot') {
         if (startButton.contains(x, y)) {
-          return buttonSprite;
+          return buttonSprites[0];
         }
       } else {
-        if (resumeButton.contains(x, y) || restartButton.contains(x, y)) {
-          return buttonSprite;
+        if (resumeButton.contains(x, y)) {
+          return buttonSprites[0];
+        } else if (restartButton.contains(x, y)) {
+          return buttonSprites[1];
         }
       }
       return null;
@@ -51,7 +57,7 @@ export default class extends MusicalState {
     this.game.input.onUp.add(() => {
       const x = this.game.input.x;
       const y = this.game.input.y;
-      if (start) {
+      if (this.behind === 'pot') {
         if (startButton.contains(x, y)) {
           this.highlight.destroy();
           startState(this.game, this.behind, this.music);

@@ -91,7 +91,8 @@ const loadMenuImage = sceneImageLoader('menu', 'menu');
 function loadMenuImages(game: Phaser.Game) {
   loadMenuImage(game, 'background', 'startmenubackground');
   loadMenuImage(game, 'start', 'startmenu');
-  loadMenuImage(game, 'resume', 'resumenu');
+  loadMenuImage(game, 'resume', 'resumenu_top');
+  loadMenuImage(game, 'restart', 'resumenu_bottom');
 }
 
 const loadPotImage = sceneImageLoader('pot', 'scene1');
