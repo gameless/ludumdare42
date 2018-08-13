@@ -1,6 +1,11 @@
 Art Needed
 ==========
 
+Menu
+----
+
+- separate images for the "Resume" and "Restart" buttons
+
 Room
 ----
 
