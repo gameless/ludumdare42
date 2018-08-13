@@ -382,6 +382,7 @@ var default_1 = (function (_super) {
         this.game.add.tween(text).from({ alpha: 0 }, 2000).delay(1000).start();
         this.game.input.keyboard.addCallbacks(this, function (event) {
             if (event.keyCode === pause_1.escapeCode) {
+                _this.music.play(true);
                 music_1.startState(_this.game, 'menu', _this.music, 'pot');
             }
         });
@@ -617,7 +618,9 @@ function default_1(game) {
         },
         update: function () {
             if (soundsReady(game)) {
-                music_1.startState(game, 'menu', new music_1.Music(game, tracks));
+                var music = new music_1.Music(game, tracks);
+                music.play(true);
+                music_1.startState(game, 'menu', music);
             }
         }
     };
@@ -657,7 +660,6 @@ var default_1 = (function (_super) {
         var _this = this;
         this.game.input.keyboard.removeCallbacks();
         this.music.fadeTrack(500, 'title');
-        this.music.play(true);
         this.game.add.image(0, 0, 'menu_background');
         var buttonSprite = this.game.add.sprite(0, 0, 'menu_start');
         this.highlight = new highlight_1.Highlight(this.game, function (x, y) {
