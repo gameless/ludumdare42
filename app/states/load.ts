@@ -179,7 +179,9 @@ export default function(game: Phaser.Game) {
 
     update() {
       if (soundsReady(game)) {
-        startState(game, 'menu', new Music(game, tracks));
+        const music = new Music(game, tracks);
+        music.play(true);
+        startState(game, 'menu', music);
       }
     }
   };

@@ -10,6 +10,7 @@ export default class extends MusicalState {
 
     this.game.input.keyboard.addCallbacks(this, (event: KeyboardEvent) => {
       if (event.keyCode === escapeCode) {
+        this.music.play(true);
         startState(this.game, 'menu', this.music, 'pot');
       }
     });
