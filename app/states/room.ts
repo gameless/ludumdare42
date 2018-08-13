@@ -1,9 +1,12 @@
 export default function(game: Phaser.Game) {
   let musics: Phaser.Sound[];
-  let wall: Phaser.Image;
-  let fade: Phaser.Tween;
-  let hover: Phaser.Signal;
-  let hovering = true;
+
+  let beanLeft: Phaser.Sprite;
+  let beanRight: Phaser.Sprite;
+  let hl: Phaser.BitmapData;
+
+  const leftBean = new Phaser.Rectangle(53, 53, 8, 15);
+  const rightBean = new Phaser.Rectangle(73, 53, 8, 15);
 
   let ateBean = false;
   let growths = 0;
@@ -23,14 +26,15 @@ export default function(game: Phaser.Game) {
 
       game.add.image(0, 0, 'room_bg');
       const vines = game.add.sprite(0, 0, 'room_vines');
-      const beanLeft = game.add.sprite(0, 0, 'room_beanleft');
-      const beanRight = game.add.sprite(0, 0, 'room_beanright');
+      beanLeft = game.add.sprite(0, 0, 'room_beanleft');
+      beanRight = game.add.sprite(0, 0, 'room_beanright');
       const otherBeans = game.add.sprite(0, 0, 'room_otherbeans');
       game.add.image(0, 0, 'room_int');
       const plant = game.add.sprite(0, 0, 'room_plant');
       game.add.image(0, 0, 'room_pot');
-      wall = game.add.image(0, 0, 'room_ext');
-      wall.alpha = 0;
+
+      hl = game.make.bitmapData(160, 90);
+      game.add.image(0, 0, hl);
 
       const toolbar = game.add.image(0, 0, 'toolbar');
       const toolOrig = game.add.image(1, 2, 'toolbar_orig');
@@ -63,24 +67,12 @@ export default function(game: Phaser.Game) {
       plant.animations.add('fall', [0, 1, 2]);
       plant.animations.play('fall', 2);
 
-      hover = new Phaser.Signal();
       const timer = game.time.create();
       timer.add(1000, () => {
         game.sound.play('thud', 5);
-        hover.add(function() {
-          const newAlpha = hovering ? 0 : 1;
-          const time = Math.abs(newAlpha - wall.alpha) * 250;
-          if (fade) {
-            fade.stop();
-          }
-          fade = game.add.tween(wall);
-          fade.to({ alpha: newAlpha }, time, Phaser.Easing.Default, true);
-        });
 
         game.input.onDown.add(() => {
           if (!ateBean) {
-            const leftBean = new Phaser.Rectangle(53, 53, 8, 15);
-            const rightBean = new Phaser.Rectangle(73, 53, 8, 15);
             if (leftBean.contains(game.input.x, game.input.y)) {
               ateBean = true;
               beanLeft.frame = 1;
@@ -128,7 +120,10 @@ export default function(game: Phaser.Game) {
                       game.add.tween(darken).from({ alpha: 0 }, 1000, Phaser.Easing.Default, true);
 
                       const innerTimer = game.time.create();
-                      innerTimer.add(1000, () => game.state.start('planet', true, false, musics));
+                      innerTimer.add(1000, () => {
+                        hl.destroy();
+                        game.state.start('planet', true, false, musics);
+                      });
                       innerTimer.start();
                     }
                   });
@@ -152,17 +147,22 @@ export default function(game: Phaser.Game) {
       timer.start();
     },
 
-    update() {
-      const closeToWall = new Phaser.Polygon([
-        [25, 15], [135, 15], [135, 85], [25, 85]
-      ].map(([x, y]) => new Phaser.Point(x, y)));
-
-      const mouseX = game.input.mousePointer.x;
-      const mouseY = game.input.mousePointer.y;
-      const hoveringNow = closeToWall.contains(mouseX, mouseY);
-      if (hoveringNow !== hovering) {
-        hovering = hoveringNow;
-        hover.dispatch();
+    render() {
+      hl.clear();
+      hl.blendSourceOver();
+      hl.fill(0xff, 0xff, 0xff, 0.75);
+      hl.blendDestinationIn();
+      hl.circle(game.input.x, game.input.y, 10);
+      if (!ateBean) {
+        if (leftBean.contains(game.input.x, game.input.y)) {
+          hl.draw(beanLeft);
+        } else if (rightBean.contains(game.input.x, game.input.y)) {
+          hl.draw(beanRight);
+        } else {
+          hl.clear();
+        }
+      } else {
+        hl.clear()
       }
     }
   };

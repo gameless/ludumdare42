@@ -78,7 +78,6 @@ export default function(game: Phaser.Game) {
       game.load.image('room_bg', 'Image/scene2/background2.png');
       game.load.image('room_int', 'Image/scene2/wallinterior.png');
       game.load.image('room_pot', 'Image/scene2/brokenpotshards.png');
-      game.load.image('room_ext', 'Image/scene2/wallexterior.png');
 
       game.load.spritesheet('room_vines', 'Image/scene2/vine spritesheet.png', 160, 90);
       game.load.spritesheet('room_beanleft', 'Image/scene2/beanleft spritesheet.png', 160, 90);
