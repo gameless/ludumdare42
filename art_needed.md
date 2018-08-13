@@ -4,11 +4,6 @@ Art Needed
 Pot
 ---
 
-- blood spritesheet
-  - (if this results in layering issues then I also need a new pot exterior
-    spritesheet)
-- plant withering spritesheet
-
 Room
 ----
 
@@ -20,19 +15,7 @@ Room
 - spritesheets for each of the bean plants that the player can grow
   - these can possibly be reused; just give me the coordinates that I should
     place them in the scene
-- make the vines farther away
-  - specifically, the one reachable from growing bean plants should be in the
-    12x12 square with top-left corner (82, 40)
-  - then we need frames in the vine spritesheet for the other vines shrinking up
-    to the top of the wall and disappearing
-  - also I'm not sure anymore if we need to keep the "shove vine into the
-    ground" thing but if so then we need animation for that; in any case we need
-    animation for reaching out to grab the vine
 - one or two spritesheets for the vines the player can grow
 
 Planet
 ------
-
-- spritesheet for the whole animation
-  - we probably don't need to split anything up here
-  - except maybe the background (space)
