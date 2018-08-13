@@ -246,6 +246,7 @@ function default_1(game) {
             game.load.spritesheet('room_otherbeans', 'Image/scene2/otherbeans spritesheet.png', 160, 90);
             game.load.spritesheet('room_plant', 'Image/scene2/plant spritesheet.png', 160, 90);
             game.load.spritesheet('planet', 'Image/scenefinal/scenefinal spritesheet.png', 160, 90);
+            game.load.image('credits', 'Image/credits.png');
         },
         create: function () {
             game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
@@ -283,9 +284,7 @@ require.register("states/credits.ts", function(exports, require, module) {
 function default_1(game) {
     return {
         create: function () {
-            var credits = 'Art: Laura Estep\nCode: Sam Estep\nSound: Ezra LaFleur';
-            var style = { font: '16px sans', fill: '#ffffff' };
-            var text = game.add.text(0, 0, credits, style);
+            var text = game.add.image(0, 0, 'credits');
             text.alpha = 0;
             var fadeInTimer = game.time.create();
             fadeInTimer.add(1000, function () {
