@@ -36,6 +36,27 @@ export default class extends MusicalState {
     this.startFade = startFade;
   }
 
+  startBlood(blood: Phaser.Sprite) {
+    let shattered = false;
+    blood.animations.add('spread');
+    blood.animations.play('spread', 0.5);
+    delay(this.game, 10000, () => {
+      this.music.fadeBadness(10000, 1);
+      if (!shattered) {
+        delay(this.game, 10000, () => {
+          if (!shattered) {
+            fadeOut(this.game, 1000);
+            delay(this.game, 1000, () => {
+              this.highlight.destroy();
+              startState(this.game, 'room', this.music, true);
+            });
+          }
+        });
+      }
+    });
+    return () => shattered = true;
+  }
+
   setupTool(
     tool: Phaser.Image,
     dots: () => [number, number][],
@@ -165,6 +186,7 @@ export default class extends MusicalState {
     this.game.add.image(0, 0, 'room_int');
     const plant = this.game.add.sprite(0, 0, 'room_plant');
     this.game.add.image(0, 0, 'room_pot');
+    const blood = this.game.add.sprite(0, 0, 'room_blood');
     this.toolbar = this.game.add.image(0, 0, 'room_toolbar');
     this.toolOrig = this.game.add.image(1, 2, 'room_toolorig');
     this.toolBean = this.game.add.image(12, 1, 'room_toolbean');
@@ -199,6 +221,8 @@ export default class extends MusicalState {
     if (this.startFade) {
       fadeIn(this.game, 1000);
     }
+
+    const stopBlood = this.startBlood(blood);
 
     plant.animations.add('fall', [0, 1, 2]);
     plant.animations.play('fall', 2);

@@ -142,6 +142,7 @@ function loadRoomImages(game: Phaser.Game) {
   loadRoomImage(game, 'int', 'wallinterior');
   loadRoomSheet(game, 'plant', 'plant spritesheet');
   loadRoomImage(game, 'pot', 'brokenpotshards');
+  loadRoomSheet(game, 'blood', 'plantblood spritesheet');
 }
 
 const loadIslandImage = sceneImageLoader('island', 'scene3');
