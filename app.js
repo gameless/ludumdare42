@@ -419,6 +419,27 @@ var default_1 = (function (_super) {
         _super.prototype.init.call(this, music);
         this.startFade = startFade;
     };
+    default_1.prototype.startBlood = function (blood) {
+        var _this = this;
+        var shattered = false;
+        blood.animations.add('spread');
+        blood.animations.play('spread', 0.5);
+        delay_1.delay(this.game, 8000, function () {
+            _this.music.fadeBadness(8000, 1);
+            if (!shattered) {
+                delay_1.delay(_this.game, 8000, function () {
+                    if (!shattered) {
+                        fade_1.fadeOut(_this.game, 1000);
+                        delay_1.delay(_this.game, 1000, function () {
+                            _this.highlight.destroy();
+                            music_1.startState(_this.game, 'island', _this.music, true);
+                        });
+                    }
+                });
+            }
+        });
+        return function () { return shattered = true; };
+    };
     default_1.prototype.create = function () {
         var _this = this;
         this.game.input.keyboard.removeCallbacks();
@@ -428,6 +449,7 @@ var default_1 = (function (_super) {
         this.game.add.image(0, 0, 'island_trees');
         var plant = this.game.add.sprite(0, 0, 'island_plant');
         var seaweed = this.game.add.sprite(0, 0, 'island_seaweed');
+        var blood = this.game.add.sprite(0, 0, 'island_blood');
         plant.animations.add('grow').play(2);
         this.game.input.keyboard.addCallbacks(this, function (event) {
             if (event.keyCode === pause_1.escapeCode) {
@@ -444,6 +466,7 @@ var default_1 = (function (_super) {
         if (this.startFade) {
             fade_1.fadeIn(this.game, 1000);
         }
+        var stopBlood = this.startBlood(blood);
         delay_1.delay(this.game, 1000, function () {
             _this.game.input.onUp.add(function () {
                 if (seaweedBox.contains(_this.game.input.x, _this.game.input.y)) {
@@ -588,6 +611,7 @@ function loadRoomImages(game) {
     loadRoomImage(game, 'int', 'wallinterior');
     loadRoomSheet(game, 'plant', 'plant spritesheet');
     loadRoomImage(game, 'pot', 'brokenpotshards');
+    loadRoomSheet(game, 'blood', 'plantblood spritesheet');
 }
 var loadIslandImage = sceneImageLoader('island', 'scene3');
 var loadIslandSheet = sceneSheetLoader('island', 'scene3');
@@ -596,6 +620,7 @@ function loadIslandImages(game) {
     loadIslandSheet(game, 'plant', 'plant spritesheet');
     loadIslandSheet(game, 'seaweed', 'seaweed spritesheet');
     loadIslandImage(game, 'trees', 'trees');
+    loadIslandSheet(game, 'blood', 'blood spritesheet');
 }
 var loadPlanetSheet = sceneSheetLoader('planet', 'scenefinal');
 function loadPlanetImages(game) {
@@ -1023,6 +1048,27 @@ var default_1 = (function (_super) {
         _super.prototype.init.call(this, music);
         this.startFade = startFade;
     };
+    default_1.prototype.startBlood = function (blood) {
+        var _this = this;
+        var shattered = false;
+        blood.animations.add('spread');
+        blood.animations.play('spread', 0.5);
+        delay_1.delay(this.game, 10000, function () {
+            _this.music.fadeBadness(10000, 1);
+            if (!shattered) {
+                delay_1.delay(_this.game, 10000, function () {
+                    if (!shattered) {
+                        fade_1.fadeOut(_this.game, 1000);
+                        delay_1.delay(_this.game, 1000, function () {
+                            _this.highlight.destroy();
+                            music_1.startState(_this.game, 'room', _this.music, true);
+                        });
+                    }
+                });
+            }
+        });
+        return function () { return shattered = true; };
+    };
     default_1.prototype.setupTool = function (tool, dots, action) {
         var _this = this;
         var initialX = tool.x;
@@ -1134,6 +1180,7 @@ var default_1 = (function (_super) {
         this.game.add.image(0, 0, 'room_int');
         var plant = this.game.add.sprite(0, 0, 'room_plant');
         this.game.add.image(0, 0, 'room_pot');
+        var blood = this.game.add.sprite(0, 0, 'room_blood');
         this.toolbar = this.game.add.image(0, 0, 'room_toolbar');
         this.toolOrig = this.game.add.image(1, 2, 'room_toolorig');
         this.toolBean = this.game.add.image(12, 1, 'room_toolbean');
@@ -1164,6 +1211,7 @@ var default_1 = (function (_super) {
         if (this.startFade) {
             fade_1.fadeIn(this.game, 1000);
         }
+        var stopBlood = this.startBlood(blood);
         plant.animations.add('fall', [0, 1, 2]);
         plant.animations.play('fall', 2);
         delay_1.delay(this.game, 1000, function () {
