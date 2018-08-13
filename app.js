@@ -150,42 +150,72 @@ var __makeRelativeRequire = function(require, mappings, pref) {
 require.register("initialize.ts", function(exports, require, module) {
 /// <reference path="../node_modules/phaser-ce/typescript/phaser.d.ts"/>
 "use strict";
-var boot_1 = require("./states/boot");
+var load_1 = require("./states/load");
 var menu_1 = require("./states/menu");
 var pot_1 = require("./states/pot");
 var room_1 = require("./states/room");
 var planet_1 = require("./states/planet");
 var credits_1 = require("./states/credits");
 var game = new Phaser.Game({ width: 160, height: 90, parent: 'parent', antialias: false });
-game.state.add('boot', boot_1.default(game));
+game.state.add('load', load_1.default(game));
 game.state.add('menu', menu_1.default(game));
 game.state.add('pot', pot_1.default(game));
 game.state.add('room', room_1.default(game));
 game.state.add('planet', planet_1.default(game));
 game.state.add('credits', credits_1.default(game));
-game.state.start('boot');
+game.state.start('load');
 
 
 });
 
-require.register("states/boot.ts", function(exports, require, module) {
+require.register("states/credits.ts", function(exports, require, module) {
 "use strict";
 function default_1(game) {
-    function loadAudio(key, filename) {
-        game.load.audio(key, [
-            'Audio/OggFiles/' + filename + '.ogg',
-            'Audio/WavFiles/' + filename + '.wav'
-        ]);
-    }
+    return {
+        create: function () {
+            var text = game.add.image(0, 0, 'credits');
+            text.alpha = 0;
+            var fadeInTimer = game.time.create();
+            fadeInTimer.add(1000, function () {
+                game.add.tween(text).to({ alpha: 1 }, 2000).start();
+            });
+            fadeInTimer.start();
+        }
+    };
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
+;
+
+
+});
+
+require.register("states/load.ts", function(exports, require, module) {
+"use strict";
+var PIXELS_PER_PIXEL = 7;
+function loadAudio(game, key, filename) {
+    game.load.audio(key, [
+        'Audio/OggFiles/' + filename + '.ogg',
+        'Audio/WavFiles/' + filename + '.wav'
+    ]);
+}
+function default_1(game) {
     return {
         preload: function () {
-            loadAudio('music0', 'Music/TitleMusic');
-            loadAudio('music1', 'Music/Fun1');
-            loadAudio('music2', 'Music/Fun2');
-            loadAudio('music3', 'Music/Fun3');
-            loadAudio('music4', 'Music/Fun4');
-            loadAudio('music5', 'Music/Fun1Bitcrushed');
-            loadAudio('end', 'Music/End');
+            game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
+            game.scale.setUserScale(PIXELS_PER_PIXEL, PIXELS_PER_PIXEL);
+            game.renderer.renderSession.roundPixels = true;
+            Phaser.Canvas.setImageRenderingCrisp(game.canvas);
+            var loadingTexture = game.make.bitmapData(80, 2);
+            loadingTexture.fill(0xff, 0xff, 0xff);
+            game.load.setPreloadSprite(game.add.sprite(40, 44, loadingTexture));
+            loadAudio(game, 'music0', 'Music/TitleMusic');
+            loadAudio(game, 'music1', 'Music/Fun1');
+            loadAudio(game, 'music2', 'Music/Fun2');
+            loadAudio(game, 'music3', 'Music/Fun3');
+            loadAudio(game, 'music4', 'Music/Fun4');
+            loadAudio(game, 'music5', 'Music/Fun1Bitcrushed');
+            loadAudio(game, 'end', 'Music/End');
             game.load.image('menu_background', 'Image/menu/startmenubackground.png');
             game.load.image('menu_start', 'Image/menu/startmenu.png');
             game.load.image('menu_resume', 'Image/menu/resumenu.png');
@@ -193,14 +223,14 @@ function default_1(game) {
             game.load.image('toolbar_orig', 'Image/scene2/planticon (1,2).png');
             game.load.image('toolbar_bean', 'Image/scene2/beanicon (12,1).png');
             game.load.image('toolbar_vine', 'Image/scene2/vineicon (22,3).png');
-            loadAudio('root1', 'SoundEffects/RootGrow1');
-            loadAudio('root2', 'SoundEffects/RootGrow2');
-            loadAudio('root3', 'SoundEffects/RootGrow3');
-            loadAudio('root4', 'SoundEffects/RootGrow4');
-            loadAudio('root5', 'SoundEffects/RootGrow5');
-            loadAudio('root6', 'SoundEffects/RootGrow6');
-            loadAudio('root7', 'SoundEffects/RootGrow7');
-            loadAudio('shatter', 'SoundEffects/PotShattering');
+            loadAudio(game, 'root1', 'SoundEffects/RootGrow1');
+            loadAudio(game, 'root2', 'SoundEffects/RootGrow2');
+            loadAudio(game, 'root3', 'SoundEffects/RootGrow3');
+            loadAudio(game, 'root4', 'SoundEffects/RootGrow4');
+            loadAudio(game, 'root5', 'SoundEffects/RootGrow5');
+            loadAudio(game, 'root6', 'SoundEffects/RootGrow6');
+            loadAudio(game, 'root7', 'SoundEffects/RootGrow7');
+            loadAudio(game, 'shatter', 'SoundEffects/PotShattering');
             game.load.image('pot_bg', 'Image/scene1/blurredbg.png');
             game.load.image('pot_shelf', 'Image/scene1/shelf.png');
             game.load.image('pot_shelf_hl', 'Image/scene1/shelfhighlighting.png');
@@ -227,15 +257,15 @@ function default_1(game) {
             game.load.spritesheet('pot_pot', 'Image/scene1/potbreaking spritesheet.png', 160, 90);
             game.load.spritesheet('pot_rootleft', 'Image/scene1/rootleft spritesheet.png', 160, 90);
             game.load.spritesheet('pot_rootright', 'Image/scene1/rootright spritesheet.png', 160, 90);
-            loadAudio('thud', 'SoundEffects/Thud');
-            loadAudio('bean', 'SoundEffects/BeanPlant');
-            loadAudio('grow1', 'SoundEffects/Grow1');
-            loadAudio('grow2', 'SoundEffects/Grow2');
-            loadAudio('grow3', 'SoundEffects/Grow3');
-            loadAudio('grow4', 'SoundEffects/Grow4');
-            loadAudio('grow5', 'SoundEffects/Grow5');
-            loadAudio('grow6', 'SoundEffects/Grow6');
-            loadAudio('snap', 'SoundEffects/VineSnap');
+            loadAudio(game, 'thud', 'SoundEffects/Thud');
+            loadAudio(game, 'bean', 'SoundEffects/BeanPlant');
+            loadAudio(game, 'grow1', 'SoundEffects/Grow1');
+            loadAudio(game, 'grow2', 'SoundEffects/Grow2');
+            loadAudio(game, 'grow3', 'SoundEffects/Grow3');
+            loadAudio(game, 'grow4', 'SoundEffects/Grow4');
+            loadAudio(game, 'grow5', 'SoundEffects/Grow5');
+            loadAudio(game, 'grow6', 'SoundEffects/Grow6');
+            loadAudio(game, 'snap', 'SoundEffects/VineSnap');
             game.load.image('room_bg', 'Image/scene2/background2.png');
             game.load.image('room_int', 'Image/scene2/wallinterior.png');
             game.load.image('room_pot', 'Image/scene2/brokenpotshards.png');
@@ -247,25 +277,11 @@ function default_1(game) {
             game.load.spritesheet('planet', 'Image/scenefinal/scenefinal spritesheet.png', 160, 90);
             game.load.image('credits', 'Image/credits.png');
         },
-        create: function () {
-            game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
-            game.scale.setUserScale(7, 7);
-            game.renderer.renderSession.roundPixels = true;
-            Phaser.Canvas.setImageRenderingCrisp(game.canvas);
-            game.camera.bounds = game.world.bounds;
-        },
         update: function () {
             var ready = [0, 1, 2, 3, 4, 5].every(function (n) {
                 return game.cache.isSoundDecoded('music' + n);
             });
             if (ready) {
-                var loadingTag = document.getElementById('loading');
-                if (loadingTag) {
-                    var parent = loadingTag.parentNode;
-                    if (parent) {
-                        parent.removeChild(loadingTag);
-                    }
-                }
                 var musics = [];
                 musics.push(game.sound.play('music0', 1, true));
                 musics.push(game.sound.play('music1', 0, true));
@@ -275,28 +291,6 @@ function default_1(game) {
                 musics.push(game.sound.play('music5', 0, true));
                 game.state.start('menu', true, false, musics);
             }
-        }
-    };
-}
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = default_1;
-;
-
-
-});
-
-require.register("states/credits.ts", function(exports, require, module) {
-"use strict";
-function default_1(game) {
-    return {
-        create: function () {
-            var text = game.add.image(0, 0, 'credits');
-            text.alpha = 0;
-            var fadeInTimer = game.time.create();
-            fadeInTimer.add(1000, function () {
-                game.add.tween(text).to({ alpha: 1 }, 2000).start();
-            });
-            fadeInTimer.start();
         }
     };
 }
