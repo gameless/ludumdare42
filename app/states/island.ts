@@ -17,6 +17,27 @@ export default class extends MusicalState {
     this.startFade = startFade;
   }
 
+  startBlood(blood: Phaser.Sprite) {
+    let shattered = false;
+    blood.animations.add('spread');
+    blood.animations.play('spread', 0.5);
+    delay(this.game, 8000, () => {
+      this.music.fadeBadness(8000, 1);
+      if (!shattered) {
+        delay(this.game, 8000, () => {
+          if (!shattered) {
+            fadeOut(this.game, 1000);
+            delay(this.game, 1000, () => {
+              this.highlight.destroy();
+              startState(this.game, 'island', this.music, true);
+            });
+          }
+        });
+      }
+    });
+    return () => shattered = true;
+  }
+
   create() {
     this.game.input.keyboard.removeCallbacks();
 
@@ -27,6 +48,7 @@ export default class extends MusicalState {
     this.game.add.image(0, 0, 'island_trees');
     const plant = this.game.add.sprite(0, 0, 'island_plant');
     const seaweed = this.game.add.sprite(0, 0, 'island_seaweed');
+    const blood = this.game.add.sprite(0, 0, 'island_blood');
 
     plant.animations.add('grow').play(2);
 
@@ -47,6 +69,8 @@ export default class extends MusicalState {
     if (this.startFade) {
       fadeIn(this.game, 1000);
     }
+
+    const stopBlood = this.startBlood(blood);
 
     delay(this.game, 1000, () => {
       this.game.input.onUp.add(() => {

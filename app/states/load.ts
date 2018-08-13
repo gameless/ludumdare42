@@ -153,6 +153,7 @@ function loadIslandImages(game: Phaser.Game) {
   loadIslandSheet(game, 'plant', 'plant spritesheet');
   loadIslandSheet(game, 'seaweed', 'seaweed spritesheet');
   loadIslandImage(game, 'trees', 'trees');
+  loadIslandSheet(game, 'blood', 'blood spritesheet');
 }
 
 const loadPlanetSheet = sceneSheetLoader('planet', 'scenefinal');
