@@ -87,6 +87,8 @@ export default function(game: Phaser.Game) {
       game.load.spritesheet('room_plant', 'Image/scene2/plant spritesheet.png', 160, 90);
 
       game.load.spritesheet('planet', 'Image/scenefinal/scenefinal spritesheet.png', 160, 90);
+
+      game.load.image('credits', 'Image/credits.png');
     },
 
     create() {
