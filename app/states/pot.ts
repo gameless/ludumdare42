@@ -47,7 +47,7 @@ export default class extends MusicalState {
           if (!shattered) {
             fadeOut(this.game, 1000);
             delay(this.game, 1000, () => {
-              startState(this.game, 'pot', this.music);
+              startState(this.game, 'pot', this.music, true);
             });
           }
         });
