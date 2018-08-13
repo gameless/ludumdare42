@@ -206,6 +206,9 @@ function default_1(game) {
             game.scale.setUserScale(PIXELS_PER_PIXEL, PIXELS_PER_PIXEL);
             game.renderer.renderSession.roundPixels = true;
             Phaser.Canvas.setImageRenderingCrisp(game.canvas);
+            var loadingEnclosure = game.add.graphics();
+            loadingEnclosure.lineStyle(1, 0xffffff, 1);
+            loadingEnclosure.drawRect(38, 42, 83, 5);
             var loadingTexture = game.make.bitmapData(80, 2);
             loadingTexture.fill(0xff, 0xff, 0xff);
             game.load.setPreloadSprite(game.add.sprite(40, 44, loadingTexture));
