@@ -72,7 +72,7 @@ export default class extends MusicalState {
       fade.to({ alpha: newAlpha }, time).start();
     });
 
-    self.game.input.onDown.add(function() {
+    self.game.input.onUp.add(function() {
       if (self.hovering) {
         if (showCross) {
           if (self.game.input.x < 80 && leftGrowth < 4) {
