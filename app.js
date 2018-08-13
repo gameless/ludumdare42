@@ -403,8 +403,10 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var delay_1 = require("../delay");
 var fade_1 = require("../fade");
+var highlight_1 = require("../highlight");
 var pause_1 = require("../pause");
 var music_1 = require("../music");
+var seaweedBox = new Phaser.Rectangle(117, 67, 13, 11);
 var default_1 = (function (_super) {
     __extends(default_1, _super);
     function default_1() {
@@ -422,22 +424,40 @@ var default_1 = (function (_super) {
         this.music.fadeTrack(500, 'mid1');
         this.music.fadeBadness(500, 0);
         this.game.add.image(0, 0, 'island_bg');
+        this.game.add.image(0, 0, 'island_trees');
+        var plant = this.game.add.sprite(0, 0, 'island_plant');
+        var seaweed = this.game.add.sprite(0, 0, 'island_seaweed');
+        plant.animations.add('grow').play(2);
         this.game.input.keyboard.addCallbacks(this, function (event) {
             if (event.keyCode === pause_1.escapeCode) {
+                _this.highlight.destroy();
                 music_1.startState(_this.game, 'menu', _this.music, 'island');
             }
+        });
+        this.highlight = new highlight_1.Highlight(this.game, function (x, y) {
+            if (seaweedBox.contains(x, y)) {
+                return seaweed;
+            }
+            return null;
         });
         if (this.startFade) {
             fade_1.fadeIn(this.game, 1000);
         }
         delay_1.delay(this.game, 1000, function () {
             _this.game.input.onUp.add(function () {
-                fade_1.fadeOut(_this.game, 1000);
-                delay_1.delay(_this.game, 1000, function () {
-                    music_1.startState(_this.game, 'planet', _this.music);
-                });
+                if (seaweedBox.contains(_this.game.input.x, _this.game.input.y)) {
+                    seaweed.animations.add('shrink', [1, 2]).play(2);
+                    fade_1.fadeOut(_this.game, 1000);
+                    delay_1.delay(_this.game, 1000, function () {
+                        _this.highlight.destroy();
+                        music_1.startState(_this.game, 'planet', _this.music);
+                    });
+                }
             });
         });
+    };
+    default_1.prototype.render = function () {
+        this.highlight.render();
     };
     return default_1;
 }(music_1.MusicalState));
@@ -568,7 +588,7 @@ function loadRoomImages(game) {
     loadRoomImage(game, 'pot', 'brokenpotshards');
 }
 var loadIslandImage = sceneImageLoader('island', 'scene3');
-var loadIslandSheet = sceneImageLoader('island', 'scene3');
+var loadIslandSheet = sceneSheetLoader('island', 'scene3');
 function loadIslandImages(game) {
     loadIslandImage(game, 'bg', 'bg3');
     loadIslandSheet(game, 'plant', 'plant spritesheet');
@@ -631,7 +651,7 @@ var default_1 = (function (_super) {
     }
     default_1.prototype.init = function (music, behind) {
         _super.prototype.init.call(this, music);
-        this.behind = behind || 'island';
+        this.behind = behind || 'pot';
     };
     default_1.prototype.create = function () {
         var _this = this;
