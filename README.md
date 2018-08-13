@@ -1,6 +1,18 @@
 Plant's Conquest
 ================
 
+Experience the life of a planet that has a plant on it. This plant is smol.
+However, it has massive ambition. The problem is, that ambition causes it to
+destroy everything that one could hold dear on our wonderful planet.
+
+In our game, you play as a plant that emits a toxic substance that kills it and
+things around it. It needs to expand in order to escape from this substance. The
+goal is thus to escape into progressively larger levels.
+
+(Apologies for the low amount of content and feeling of unfinishedness; this is
+our first Ludum Dare and we sort of bit off more than we could chew with the
+specific type of game we tried to make.)
+
 Install
 -------
 
