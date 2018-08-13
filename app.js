@@ -550,7 +550,8 @@ var loadMenuImage = sceneImageLoader('menu', 'menu');
 function loadMenuImages(game) {
     loadMenuImage(game, 'background', 'startmenubackground');
     loadMenuImage(game, 'start', 'startmenu');
-    loadMenuImage(game, 'resume', 'resumenu');
+    loadMenuImage(game, 'resume', 'resumenu_top');
+    loadMenuImage(game, 'restart', 'resumenu_bottom');
 }
 var loadPotImage = sceneImageLoader('pot', 'scene1');
 var loadPotSheet = sceneSheetLoader('pot', 'scene1');
@@ -641,8 +642,20 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var highlight_1 = require("../highlight");
 var music_1 = require("../music");
-var button = new Phaser.Polygon([
+var startButton = new Phaser.Polygon([
     [16, 25], [13, 57], [145, 64], [145, 30]
+].map(function (_a) {
+    var x = _a[0], y = _a[1];
+    return new Phaser.Point(x, y);
+}));
+var resumeButton = new Phaser.Polygon([
+    [17, 6], [14, 38], [146, 45], [146, 11]
+].map(function (_a) {
+    var x = _a[0], y = _a[1];
+    return new Phaser.Point(x, y);
+}));
+var restartButton = new Phaser.Polygon([
+    [14, 46], [14, 80], [143, 85], [146, 53]
 ].map(function (_a) {
     var x = _a[0], y = _a[1];
     return new Phaser.Point(x, y);
@@ -661,14 +674,48 @@ var default_1 = (function (_super) {
         this.game.input.keyboard.removeCallbacks();
         this.music.fadeTrack(500, 'title');
         this.game.add.image(0, 0, 'menu_background');
-        var buttonSprite = this.game.add.sprite(0, 0, 'menu_start');
+        var buttonSprites = [];
+        if (this.behind === 'pot') {
+            buttonSprites.push(this.game.add.sprite(0, 0, 'menu_start'));
+        }
+        else {
+            buttonSprites.push(this.game.add.sprite(0, 0, 'menu_resume'));
+            buttonSprites.push(this.game.add.sprite(0, 0, 'menu_restart'));
+        }
         this.highlight = new highlight_1.Highlight(this.game, function (x, y) {
-            return button.contains(x, y) ? buttonSprite : null;
+            if (_this.behind === 'pot') {
+                if (startButton.contains(x, y)) {
+                    return buttonSprites[0];
+                }
+            }
+            else {
+                if (resumeButton.contains(x, y)) {
+                    return buttonSprites[0];
+                }
+                else if (restartButton.contains(x, y)) {
+                    return buttonSprites[1];
+                }
+            }
+            return null;
         });
         this.game.input.onUp.add(function () {
-            if (button.contains(_this.game.input.x, _this.game.input.y)) {
-                _this.highlight.destroy();
-                music_1.startState(_this.game, _this.behind, _this.music);
+            var x = _this.game.input.x;
+            var y = _this.game.input.y;
+            if (_this.behind === 'pot') {
+                if (startButton.contains(x, y)) {
+                    _this.highlight.destroy();
+                    music_1.startState(_this.game, _this.behind, _this.music);
+                }
+            }
+            else {
+                if (resumeButton.contains(x, y)) {
+                    _this.highlight.destroy();
+                    music_1.startState(_this.game, _this.behind, _this.music);
+                }
+                else if (restartButton.contains(x, y)) {
+                    _this.highlight.destroy();
+                    music_1.startState(_this.game, 'pot', _this.music);
+                }
             }
         });
     };
