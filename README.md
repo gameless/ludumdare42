@@ -9,6 +9,10 @@ In our game, you play as a plant that emits a toxic substance that kills it and
 things around it. It needs to expand in order to escape from this substance. The
 goal is thus to escape into progressively larger levels.
 
+The game *technically* works on mobile, but not really; it cuts off some stuff
+that you need to finish the second level. Also, audio doesn't work on iOS for
+some reason ¯\\\_(ツ)\_/¯; in any case, please try it on desktop!
+
 (Apologies for the low amount of content and feeling of unfinishedness; this is
 our first Ludum Dare and we sort of bit off more than we could chew with the
 specific type of game we tried to make.)
