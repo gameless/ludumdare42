@@ -1,4 +1,4 @@
-Plant's Conquest
+[Plant's Conquest] ([for Ludum Dare 42])
 ================
 
 Experience the life of a planet that has a plant on it. This plant is smol.
@@ -47,3 +47,6 @@ First clone the `gh-pages` branch to `../ludumdare42-gh-pages`:
 git clone -b gh-pages --single-branch https://github.com/gameless/ludumdare42.git ../ludumdare42-gh-pages
 ```
 Then anytime you want to build, run `build.sh` from the root of this repository.
+
+[for ludum dare 42]: https://ldjam.com/events/ludum-dare/42/plants-conquest
+[plant's conquest]: https://gameless.github.io/ludumdare42/
