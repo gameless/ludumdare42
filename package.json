@@ -1,8 +1,9 @@
 {
   "license": "MIT",
   "repository": "github:gameless/ludumdare42",
+  "main": "public/main.js",
   "scripts": {
-    "start": "brunch watch --server",
+    "start": "electron .",
     "build": "brunch build --production",
     "test": "tsc --noEmit"
   },
@@ -15,6 +16,7 @@
   "devDependencies": {
     "auto-reload-brunch": "^2",
     "brunch": "^2",
+    "electron": "^3",
     "typescript-brunch": "^2"
   }
 }
