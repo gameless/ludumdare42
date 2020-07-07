@@ -16,7 +16,7 @@
   "devDependencies": {
     "auto-reload-brunch": "^2",
     "brunch": "^2",
-    "electron": "^3",
+    "electron": "^9",
     "typescript-brunch": "^2"
   }
 }
